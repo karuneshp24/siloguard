@@ -728,6 +728,20 @@ function triggerCrisisNow() {
   // Play sound
   playEmergencyAlarm();
   
+  // Transmit real-time push alert to phone in plain English
+  try {
+    var alertPayload = "CRITICAL ALERT: Silo #4 Deep Core temperature has surged to 43.8°C (+14.2°C anomaly). Fungal Growth Factor (Af) reached 5.42x. Safe storage remaining: 22.8 hours. Automated protocol: Turbo Aeration Fans engaged at 100% capacity. Dynamic Liquidation Auction broadcasted at 35% discount.";
+    fetch("https://ntfy.sh/siloguard_8220480281", {
+      method: "POST",
+      headers: {
+        "Title": "🚨 CRITICAL SPOILAGE ALERT: Silo #4 Anomaly",
+        "Priority": "urgent",
+        "Tags": "warning,biohazard"
+      },
+      body: alertPayload
+    }).catch(function(e){ console.warn("Push notice:", e); });
+  } catch(ex){}
+
   // Update mode banner
   var banner = document.getElementById('modeBanner');
   banner.className = 'mode-banner crisis';
