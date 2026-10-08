@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
+<title>SiloGuard Bio-Energy — 40% Anaerobic Biofuel Power Plant</title>
+<style>
+/* ── Theme: Cyber-Cyan & Clean Energy Bio-Reactor ─────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html,body{
+  width:100%;min-height:100vh;background:#021118;color:#e0f2fe;
+  font-family:'JetBrains Mono',Consolas,monospace;font-size:13px;overflow-x:hidden;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(6,182,212,.18), transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(16,185,129,.15), transparent 45%);
+}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#041a24}
+::-webkit-scrollbar-thumb{background:#0891b2;border-radius:3px}
+button{cursor:pointer;font-family:inherit;border:none}
+
+/* ── Top Command Bar ───────────────────────────────────────────────── */
+.topbar{
+  height:60px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.5rem;background:rgba(4,22,32,.92);border-bottom:2px solid #06b6d4;
+  box-shadow:0 0 25px rgba(6,182,212,.3);position:sticky;top:0;z-index:50;backdrop-filter:blur(16px);
+}
+.brand{display:flex;align-items:center;gap:.75rem}
+.brand-icon{
+  width:38px;height:38px;border-radius:50%;background:rgba(6,182,212,.2);border:2px solid #06b6d4;
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 0 15px #06b6d4;
+}
+.brand-text h1{font-size:1.1rem;font-weight:900;color:#f8fafc;letter-spacing:.04em;line-height:1.1}
+.brand-text p{font-size:.58rem;color:#38bdf8;text-transform:uppercase;letter-spacing:.12em}
+
+.nav-links{display:flex;align-items:center;gap:.65rem}
+.link-pill{
+  display:inline-flex;align-items:center;gap:.4rem;padding:.4rem .85rem;border-radius:.5rem;
+  background:rgba(15,23,42,.8);border:1px solid #334155;color:#94a3b8;font-size:.68rem;font-weight:700;
+  text-decoration:none;transition:all .2s;
+}
+.link-pill:hover{background:rgba(6,182,212,.2);border-color:#06b6d4;color:#38bdf8}
+
+/* ── Hero Facility Status Bar ─────────────────────────────────────── */
+.facility-hero{
+  padding:1.5rem;display:grid;grid-template-columns:1fr;gap:1.25rem;
+  border-bottom:1px solid rgba(6,182,212,.3);background:rgba(2,17,24,.6);
+}
+@media(min-width:1024px){.facility-hero{grid-template-columns:2fr 1fr}}
+
+.hero-main-card{
+  background:linear-gradient(135deg, rgba(8,51,68,.7), rgba(4,30,42,.8));
+  border:2px solid #06b6d4;border-radius:1.2rem;padding:1.5rem;
+  box-shadow:0 0 35px rgba(6,182,212,.25);position:relative;overflow:hidden;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:.4rem;background:rgba(6,182,212,.2);border:1px solid #06b6d4;
+  color:#38bdf8;font-size:.65rem;font-weight:800;padding:.25rem .65rem;border-radius:.4rem;text-transform:uppercase;
+}
+.hero-title{font-size:1.5rem;font-weight:900;color:#f0fdfa;margin:.75rem 0 .35rem;letter-spacing:.02em}
+.hero-desc{font-size:.78rem;line-height:1.5;color:#94a3b8;max-width:680px}
+
+/* Circular Split Highlight */
+.split-badge-container{
+  display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.25rem;
+}
+.stream-pill{
+  padding:.85rem 1rem;border-radius:.75rem;display:flex;flex-direction:column;gap:.25rem;
+}
+.stream-pill-40{
+  background:rgba(6,182,212,.15);border:1.5px solid #06b6d4;box-shadow:0 0 15px rgba(6,182,212,.2);
+}
+.stream-pill-60{
+  background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.4);
+}
+.stream-val{font-size:1.6rem;font-weight:900;line-height:1}
+.stream-label{font-size:.65rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+
+/* ── Live Dial Gauges & Meters ────────────────────────────────────── */
+.meters-grid{
+  display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:1rem;padding:1.5rem;
+}
+.meter-card{
+  background:rgba(6,30,42,.7);border:1px solid rgba(6,182,212,.3);border-radius:1rem;padding:1.25rem;
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:.5rem;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);position:relative;
+}
+.gauge-circle{
+  width:110px;height:110px;border-radius:50%;border:4px solid rgba(6,182,212,.2);
+  border-top-color:#06b6d4;border-right-color:#38bdf8;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:0 0 20px rgba(6,182,212,.3);animation:spinSlow 20s linear infinite;
+}
+.gauge-val{font-size:1.5rem;font-weight:900;color:#f0fdfa}
+.gauge-unit{font-size:.62rem;color:#38bdf8;font-weight:700}
+.meter-label{font-size:.68rem;font-weight:800;text-transform:uppercase;color:#94a3b8;letter-spacing:.06em}
+
+/* ── Interactive Bio-Reactor Visualizer ───────────────────────────── */
+.reactor-section{
+  margin:0 1.5rem 1.5rem;background:#030c12;border:2px solid rgba(6,182,212,.4);
+  border-radius:1.2rem;overflow:hidden;box-shadow:0 0 30px rgba(0,0,0,.8);
+}
+.reactor-head{
+  padding:.85rem 1.25rem;background:rgba(6,30,42,.9);border-bottom:1px solid rgba(6,182,212,.3);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;
+}
+.reactor-title{font-size:.8rem;font-weight:800;text-transform:uppercase;color:#e0f2fe;display:flex;align-items:center;gap:.5rem}
+#reactorCanvas{width:100%;height:360px;display:block}
+
+/* ── Interactive Control Desk ─────────────────────────────────────── */
+.control-desk{
+  padding:1.25rem 1.5rem;background:rgba(4,22,32,.95);border-top:1px solid rgba(6,182,212,.3);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+}
+.valve-btn{
+  background:linear-gradient(135deg, #0891b2, #0e7490);color:#fff;
+  font-size:.8rem;font-weight:800;padding:.75rem 1.5rem;border-radius:.6rem;
+  box-shadow:0 0 25px rgba(6,182,212,.5);transition:all .2s;text-transform:uppercase;letter-spacing:.06em;
+}
+.valve-btn:hover{transform:scale(1.03);box-shadow:0 0 35px rgba(6,182,212,.8)}
+
+.lang-btn{
+  font-size:.68rem;font-weight:700;padding:.35rem .7rem;border-radius:.4rem;
+  background:rgba(15,23,42,.8);border:1px solid #334155;color:#94a3b8;transition:all .2s;
+}
+.lang-btn.active{background:#06b6d4;color:#021118;font-weight:900;border-color:#06b6d4;box-shadow:0 0 10px rgba(6,182,212,.6)}
+
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+</style>
+</head>
+<body>
+
+<!-- ── COMMAND HEADER ── -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">⚡</div>
+    <div class="brand-text">
+      <h1>SiloGuard Bio-Energy Plant</h1>
+      <p>40% Clean Methane Biofuel & Digestion Facility</p>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <a href="index.html" class="link-pill">🌾 Switch to 60% Grain Silo Digital Twin</a>
+    <a href="virtual-silo.html" class="link-pill">🏛️ 3D Silo Telemetry Grid</a>
+  </div>
+</header>
+
+<!-- ── FACILITY HERO BANNER (Distinct 40% vs 60% Split) ── -->
+<div class="facility-hero">
+  <div class="hero-main-card">
+    <div class="hero-badge">
+      <span style="width:7px;height:7px;border-radius:50%;background:#06b6d4;animation:pulse 1s infinite"></span>
+      <span>Anaerobic Methane Digester Subsystem #01</span>
+    </div>
+    <h2 class="hero-title">Zero-Landfill Circular Bio-Refinery</h2>
+    <p class="hero-desc">
+      When SiloGuard's biological kinetic engine detects irreversible core spoilage, the automated diversion manifold redirects <strong>40% of the damaged grain biomass</strong> directly into this thermophilic methane digester to produce clean electricity and farm heating fuel.
+    </p>
+
+    <!-- Visual 40% / 60% Split Display -->
+    <div class="split-badge-container">
+      <div class="stream-pill stream-pill-40">
+        <span class="stream-label" style="color:#38bdf8">⚡ 40% Clean Energy Stream</span>
+        <span class="stream-val" style="color:#06b6d4">40% Biofuel</span>
+        <span style="font-size:.65rem;color:#bae6fd">Anaerobic Digester Methane: 380 m³/Ton</span>
+      </div>
+      <div class="stream-pill stream-pill-60">
+        <span class="stream-label" style="color:#34d399">🌾 60% Secondary Value Stream</span>
+        <span class="stream-val" style="color:#34d399">60% Feed</span>
+        <span style="font-size:.65rem;color:#a7f3d0">Steam-Pelletized Livestock Feed: 58% Capital Rescued</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Plant Overview KPI -->
+  <div style="display:flex;flex-direction:column;gap:1rem">
+    <div class="hero-main-card" style="background:rgba(6,30,42,.7);border-color:rgba(6,182,212,.3);padding:1.15rem">
+      <span style="font-size:.62rem;color:#64748b;text-transform:uppercase;font-weight:800">Carbon Mitigation</span>
+      <div style="font-size:1.8rem;font-weight:900;color:#34d399;line-height:1;margin:.3rem 0">1.85 Tons</div>
+      <span style="font-size:.65rem;color:#94a3b8">CO₂e Atmospheric Release Prevented</span>
+    </div>
+    <div class="hero-main-card" style="background:rgba(6,30,42,.7);border-color:rgba(6,182,212,.3);padding:1.15rem">
+      <span style="font-size:.62rem;color:#64748b;text-transform:uppercase;font-weight:800">Clean Energy Value</span>
+      <div style="font-size:1.8rem;font-weight:900;color:#facc15;line-height:1;margin:.3rem 0">₹26,850</div>
+      <span style="font-size:.65rem;color:#94a3b8">Total Crop Loss Converted into Revenue</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── LIVE PLANT GAUGES & METERS ── -->
+<div class="meters-grid">
+  <div class="meter-card">
+    <div class="gauge-circle">
+      <span class="gauge-val" id="gMethane">64%</span>
+      <span class="gauge-unit">CH₄ Methane</span>
+    </div>
+    <span class="meter-label">Gas Quality Purity</span>
+  </div>
+
+  <div class="meter-card">
+    <div class="gauge-circle" style="border-top-color:#34d399;border-right-color:#10b981">
+      <span class="gauge-val" style="color:#34d399" id="gFlow">42.8</span>
+      <span class="gauge-unit">m³ / hour</span>
+    </div>
+    <span class="meter-label">Biogas Flow Velocity</span>
+  </div>
+
+  <div class="meter-card">
+    <div class="gauge-circle" style="border-top-color:#facc15;border-right-color:#eab308">
+      <span class="gauge-val" style="color:#facc15" id="gTemp">38.2°</span>
+      <span class="gauge-unit">Celsius</span>
+    </div>
+    <span class="meter-label">Digestion Core Temp</span>
+  </div>
+
+  <div class="meter-card">
+    <div class="gauge-circle" style="border-top-color:#a78bfa;border-right-color:#8b5cf6">
+      <span class="gauge-val" style="color:#a78bfa" id="gPower">18.5</span>
+      <span class="gauge-unit">kW Electric</span>
+    </div>
+    <span class="meter-label">Generator Turbine Power</span>
+  </div>
+</div>
+
+<!-- ── INTERACTIVE 40% BIO-REACTOR SIMULATOR ── -->
+<div class="reactor-section">
+  <div class="reactor-head">
+    <div class="reactor-title">
+      <span style="width:8px;height:8px;border-radius:50%;background:#06b6d4;animation:pulse 1s infinite"></span>
+      <span>40% Anaerobic Fermentation Vessel & Slurry Circulation</span>
+    </div>
+    <span style="font-size:.65rem;color:#38bdf8;font-weight:700">LIVE SENSOR STREAM · 1Hz</span>
+  </div>
+  <canvas id="reactorCanvas"></canvas>
+</div>
+
+<!-- ── PLANT ACTION DESK ── -->
+<div class="control-desk">
+  <div style="display:flex;align-items:center;gap:.65rem;flex-wrap:wrap">
+    <span style="font-size:.65rem;color:#64748b;font-weight:800;text-transform:uppercase">Voice Announcer:</span>
+    <button class="lang-btn active" id="l-en" onclick="setLang('en')">English</button>
+    <button class="lang-btn" id="l-ta" onclick="setLang('ta')">தமிழ்</button>
+    <button class="lang-btn" id="l-hi" onclick="setLang('hi')">हिन्दी</button>
+  </div>
+
+  <button class="valve-btn" onclick="actuateManifold()">
+    ⚡ Actuate Biofuel Injection Manifold
+  </button>
+</div>
+
+<script>
+'use strict';
+var canvas = document.getElementById('reactorCanvas');
+var ctx = canvas.getContext('2d');
+var currentLang = 'en';
+
+var VOICE_RECOVERY = {
+  en: { lang:'en-US', msg:'Bio-Energy Facility Active. 40% spoiled grain routed to methane digesters for clean power generation.' },
+  ta: { lang:'ta-IN', msg:'உயிரி எரிபொருள் மின்நிலையம் தயார். 40 சதவீத சேதமடைந்த தானியம் மீத்தேன் வாயு மற்றும் மின் உற்பத்திக்காக அனுப்பப்படுகிறது.' },
+  hi: { lang:'hi-IN', msg:'जैव ऊर्जा संयंत्र सक्रिय है। 40 प्रतिशत अनुपयोगी अनाज को स्वच्छ बिजली उत्पादन के लिए मीथेन डाइजेस्टर में भेजा गया है।' }
+};
+
+function speak(text) {
+  try {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = VOICE_RECOVERY[currentLang].lang;
+    u.rate = 0.95;
+    window.speechSynthesis.speak(u);
+  } catch(e){}
+}
+
+function setLang(l) {
+  currentLang = l;
+  document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.remove('active');});
+  var btn = document.getElementById('l-' + l);
+  if (btn) btn.classList.add('active');
+  speak(VOICE_RECOVERY[l].msg);
+}
+
+function actuateManifold() {
+  speak(VOICE_RECOVERY[currentLang].msg);
+  alert('⚡ Manifold Valve Opened!\nInjected 4.5 Tons of thermally damaged grain biomass into the 40% Anaerobic Digester.');
+}
+
+// Particle bubbling in reactor
+var bubbles = [];
+for (var i = 0; i < 60; i++) {
+  bubbles.push({
+    x: 0, y: 0,
+    r: 2 + Math.random() * 4,
+    speed: 0.8 + Math.random() * 1.5,
+    hue: Math.random() > 0.3 ? '#06b6d4' : '#34d399'
+  });
+}
+
+function drawReactor() {
+  var W = canvas.offsetWidth || 700, H = canvas.offsetHeight || 360;
+  var dpr = window.devicePixelRatio || 1;
+  if (canvas.width !== W * dpr || canvas.height !== H * dpr) {
+    canvas.width = W * dpr; canvas.height = H * dpr;
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+
+  // 1. Draw Grain Infeed Silo Hopper (Left)
+  ctx.fillStyle = '#082f49';
+  ctx.strokeStyle = '#0284c7';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(50, 60); ctx.lineTo(170, 60);
+  ctx.lineTo(140, 200); ctx.lineTo(80, 200);
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#f8fafc'; ctx.font = 'bold 11px monospace';
+  ctx.fillText('DAMAGED GRAIN', 65, 120);
+  ctx.fillStyle = '#38bdf8'; ctx.font = '9px monospace';
+  ctx.fillText('Biomass Feed (40%)', 62, 140);
+
+  // 2. Stainless Steel Anaerobic Digester Dome (Center)
+  var cx = W * 0.52, cy = 190, rDome = 110;
+  ctx.fillStyle = '#04222a';
+  ctx.strokeStyle = '#06b6d4';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(cx, cy, rDome, Math.PI, 0);
+  ctx.lineTo(cx + rDome, cy + 80);
+  ctx.lineTo(cx - rDome, cy + 80);
+  ctx.closePath();
+  ctx.fill(); ctx.stroke();
+
+  // Fermentation Slurry liquid level
+  ctx.fillStyle = 'rgba(6,182,212,0.18)';
+  ctx.beginPath();
+  ctx.arc(cx, cy, rDome - 4, Math.PI, 0);
+  ctx.lineTo(cx + rDome - 4, cy + 76);
+  ctx.lineTo(cx - rDome + 4, cy + 76);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = '#f8fafc'; ctx.font = 'bold 13px monospace'; ctx.textAlign = 'center';
+  ctx.fillText('40% ANAEROBIC DIGESTER', cx, cy + 10);
+  ctx.fillStyle = '#34d399'; ctx.font = '10px monospace';
+  ctx.fillText('Thermophilic Methane Bloom (38.2°C)', cx, cy + 30);
+
+  // 3. Biogas Turbine Generator (Right)
+  var gx = W - 130, gy = 140;
+  ctx.fillStyle = '#1e1b4b';
+  ctx.strokeStyle = '#8b5cf6';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(gx, gy, 90, 110);
+  ctx.fillRect(gx, gy, 90, 110);
+  ctx.fillStyle = '#f8fafc'; ctx.font = 'bold 10px monospace';
+  ctx.fillText('GENERATOR', gx + 45, gy + 45);
+  ctx.fillStyle = '#a78bfa'; ctx.font = '9px monospace';
+  ctx.fillText('18.5 kW Power', gx + 45, gy + 65);
+
+  // 4. Connecting Pipelines
+  ctx.strokeStyle = 'rgba(6,182,212,0.5)';
+  ctx.lineWidth = 8;
+  // Feed pipe
+  ctx.beginPath(); ctx.moveTo(110, 200); ctx.lineTo(110, 230); ctx.lineTo(cx - rDome, 230); ctx.stroke();
+  // Gas pipe from top dome to generator
+  ctx.strokeStyle = 'rgba(52,211,153,0.6)';
+  ctx.beginPath(); ctx.moveTo(cx, cy - rDome); ctx.lineTo(cx, 60); ctx.lineTo(gx + 45, 60); ctx.lineTo(gx + 45, gy); ctx.stroke();
+
+  // 5. Animated Biogas Bubbles
+  bubbles.forEach(function(b) {
+    if (b.x === 0 && b.y === 0) {
+      b.x = (cx - rDome + 20) + Math.random() * (rDome * 2 - 40);
+      b.y = cy + 60;
+    }
+    b.y -= b.speed;
+    if (b.y < cy - 40) {
+      b.x = (cx - rDome + 20) + Math.random() * (rDome * 2 - 40);
+      b.y = cy + 60;
+    }
+    ctx.fillStyle = b.hue;
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  requestAnimationFrame(drawReactor);
+}
+drawReactor();
+</script>
+</body>
+</html>

@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
+<title>SiloGuard — 3D Virtual Silo & 75-Voxel Multi-Depth Telemetry Grid</title>
+<style>
+/* ── Reset & Theme ─────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html,body{width:100%;height:100%;overflow:hidden;background:#060911;color:#e2e8f0;font-family:'JetBrains Mono',Consolas,monospace;font-size:13px}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:#0b1120}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+button{cursor:pointer;font-family:inherit;border:none;background:none}
+
+/* ── Top Bar ───────────────────────────────────────────────────────── */
+.topbar{
+  height:52px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 1rem;background:rgba(9,13,22,.95);border-bottom:1px solid rgba(52,211,153,.25);
+  box-shadow:0 4px 20px rgba(0,0,0,.6);z-index:40;position:relative;
+}
+.topbar-left{display:flex;align-items:center;gap:.75rem}
+.brand{display:flex;align-items:center;gap:.5rem;color:#f8fafc;font-size:1rem;font-weight:700}
+.brand svg{color:#34d399;filter:drop-shadow(0 0 8px rgba(52,211,153,.6))}
+.brand-sub{font-size:.65rem;color:#94a3b8;border-left:1px solid #334155;padding-left:.6rem;text-transform:uppercase;letter-spacing:.08em;display:none}
+@media(min-width:768px){.brand-sub{display:inline}}
+.nav-link{
+  display:inline-flex;align-items:center;gap:.35rem;padding:.3rem .65rem;
+  background:rgba(15,23,42,.8);border:1px solid rgba(51,65,85,.6);border-radius:.45rem;
+  font-size:.68rem;font-weight:700;color:#94a3b8;text-decoration:none;transition:all .2s;
+}
+.nav-link:hover{background:rgba(52,211,153,.15);color:#34d399;border-color:#34d399}
+
+.topbar-right{display:flex;align-items:center;gap:.65rem}
+.lang-btn{font-size:.65rem;font-weight:700;padding:.25rem .5rem;border-radius:.35rem;border:1px solid #334155;color:#94a3b8;transition:all .2s}
+.lang-btn.active{background:#34d399;color:#090d16;border-color:#34d399;font-weight:800;box-shadow:0 0 10px rgba(52,211,153,.5)}
+.fan-btn{
+  display:inline-flex;align-items:center;gap:.35rem;font-size:.65rem;font-weight:700;
+  padding:.3rem .65rem;border-radius:.45rem;border:1px solid #f97316;background:rgba(249,115,22,.15);color:#fdba74;
+  transition:all .2s;
+}
+.fan-btn.active{background:rgba(249,115,22,.35);box-shadow:0 0 15px rgba(249,115,22,.5)}
+
+/* ── Split-Screen Layout ──────────────────────────────────────────── */
+.split-container{
+  display:flex;flex-direction:column;height:calc(100vh - 52px);width:100%;overflow:hidden;
+}
+@media(min-width:900px){
+  .split-container{flex-direction:row}
+}
+
+/* ── Left Side: 3D Virtual Silo Viewport ──────────────────────────── */
+.viewport-pane{
+  flex:1;height:50%;min-height:300px;position:relative;background:#05070d;
+  border-bottom:1px solid rgba(51,65,85,.6);overflow:hidden;
+}
+@media(min-width:900px){
+  .viewport-pane{height:100%;flex:1.1;border-bottom:none;border-right:1px solid rgba(51,65,85,.6)}
+}
+#silo3dCanvas{width:100%;height:100%;display:block}
+.hud-overlay{
+  position:absolute;top:.75rem;left:.75rem;display:flex;flex-direction:column;gap:.35rem;
+  pointer-events:none;z-index:20;
+}
+.hud-badge{
+  display:inline-flex;align-items:center;gap:.4rem;font-size:.62rem;font-weight:700;
+  padding:.25rem .6rem;border-radius:.4rem;background:rgba(9,13,22,.85);border:1px solid rgba(52,211,153,.4);
+  color:#34d399;backdrop-filter:blur(8px);text-transform:uppercase;letter-spacing:.06em;
+}
+.hud-controls{
+  position:absolute;bottom:.75rem;left:.75rem;right:.75rem;
+  display:flex;align-items:center;justify-content:space-between;pointer-events:none;
+}
+.controls-hint{
+  font-size:.62rem;color:#64748b;background:rgba(9,13,22,.8);padding:.25rem .6rem;
+  border-radius:.35rem;border:1px solid rgba(51,65,85,.5);backdrop-filter:blur(6px);
+}
+.layer-toggles{display:flex;gap:.35rem;pointer-events:auto}
+.lt-btn{
+  font-size:.62rem;font-weight:700;padding:.25rem .55rem;border-radius:.35rem;
+  background:rgba(15,23,42,.85);border:1px solid #334155;color:#94a3b8;transition:all .2s;
+}
+.lt-btn.active{border-color:#34d399;color:#34d399;background:rgba(52,211,153,.15)}
+
+/* ── Right Side: Numeric Telemetry Table & Inspector ──────────────── */
+.data-pane{
+  flex:1;height:50%;display:flex;flex-direction:column;background:#090d16;overflow:hidden;
+}
+@media(min-width:900px){
+  .data-pane{height:100%;flex:.9}
+}
+.data-header{
+  padding:.65rem .85rem;border-bottom:1px solid rgba(51,65,85,.5);background:rgba(15,23,42,.6);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;
+}
+.pane-title{font-size:.75rem;font-weight:800;color:#f8fafc;text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;gap:.4rem}
+.filter-tabs{display:flex;gap:.25rem;background:rgba(2,6,23,.8);padding:2px;border-radius:.45rem;border:1px solid #334155}
+.ftab{font-size:.62rem;font-weight:700;padding:.2rem .5rem;border-radius:.35rem;color:#94a3b8;transition:all .2s}
+.ftab.active{background:#34d399;color:#090d16;font-weight:800}
+
+/* Active Node Inspector Card */
+.inspector-card{
+  padding:.65rem .85rem;border-bottom:1px solid rgba(51,65,85,.4);background:rgba(15,23,42,.4);
+  display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;font-size:.65rem;
+}
+.ins-item{display:flex;flex-direction:column;gap:.15rem}
+.ins-label{font-size:.55rem;color:#64748b;text-transform:uppercase}
+.ins-val{font-size:.9rem;font-weight:800;color:#34d399}
+
+/* Table Area */
+.table-wrap{flex:1;overflow-y:auto;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.68rem;text-align:left}
+th{
+  position:sticky;top:0;background:#0e1526;color:#94a3b8;font-size:.58rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:.06em;padding:.5rem .65rem;border-bottom:1px solid #334155;z-index:10;
+}
+td{padding:.45rem .65rem;border-bottom:1px solid rgba(51,65,85,.3);white-space:nowrap}
+tr:hover{background:rgba(52,211,153,.08);cursor:pointer}
+tr.selected{background:rgba(52,211,153,.18)!important;outline:1px solid #34d399}
+
+.temp-badge{display:inline-block;padding:.15rem .4rem;border-radius:.3rem;font-weight:800;font-size:.65rem}
+.status-badge{font-size:.55rem;font-weight:800;padding:.15rem .35rem;border-radius:.25rem;text-transform:uppercase}
+.status-safe{background:rgba(6,78,59,.4);color:#34d399;border:1px solid rgba(52,211,153,.3)}
+.status-warn{background:rgba(113,63,18,.4);color:#facc15;border:1px solid rgba(250,204,21,.3)}
+.status-danger{background:rgba(127,29,29,.5);color:#f87171;border:1px solid rgba(248,113,113,.5);animation:pulse 1s infinite}
+
+/* Legend / Footer bar */
+.data-footer{
+  padding:.5rem .85rem;background:rgba(9,13,22,.9);border-top:1px solid rgba(51,65,85,.5);
+  display:flex;align-items:center;justify-content:space-between;font-size:.62rem;color:#64748b;
+}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.animate-spin{animation:spin 1s linear infinite}
+</style>
+</head>
+<body>
+
+<!-- ── TOP NAVIGATION BAR ── -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>SiloGuard 3D</span>
+    </div>
+    <span class="brand-sub">Virtual Silo & 75-Voxel Telemetry Grid</span>
+    <a href="index.html" class="nav-link">📊 Main Dashboard</a>
+  </div>
+
+  <div class="topbar-right">
+    <!-- Language Selector -->
+    <div style="display:flex;gap:.25rem">
+      <button class="lang-btn active" id="lang-en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="lang-ta" onclick="setLang('ta')">தமிழ்</button>
+      <button class="lang-btn" id="lang-hi" onclick="setLang('hi')">हिन्दी</button>
+    </div>
+
+    <!-- Manual Turbo Fan Trigger -->
+    <button class="fan-btn" id="fanBtn" onclick="toggleFan()">
+      <span id="fanIcon">💨</span>
+      <span id="fanLabel">Turbo Fans</span>
+    </button>
+  </div>
+</header>
+
+<!-- ── SPLIT SCREEN CONTAINER ── -->
+<div class="split-container">
+
+  <!-- LEFT PANE: 3D VIRTUAL SILO & VOXEL GRID -->
+  <div class="viewport-pane">
+    <canvas id="silo3dCanvas"></canvas>
+
+    <div class="hud-overlay">
+      <div class="hud-badge">
+        <span style="width:7px;height:7px;border-radius:50%;background:#34d399;animation:pulse 1s infinite"></span>
+        <span>75 Telemetry Voxels · Live WebGL 3D</span>
+      </div>
+      <div class="hud-badge" style="border-color:#f97316;color:#fdba74">
+        <span id="hotspotCountBadge">0 Hotspots Detected</span>
+      </div>
+    </div>
+
+    <div class="hud-controls">
+      <span class="controls-hint">🖱️ Drag to Rotate · Touch & Pan · No Zoom Jump</span>
+      <div class="layer-toggles">
+        <button class="lt-btn active" onclick="toggleLayer('all',this)">All 3 Layers</button>
+        <button class="lt-btn" onclick="toggleLayer('surface',this)">Surface (3.0m)</button>
+        <button class="lt-btn" onclick="toggleLayer('mid_level',this)">Mid (1.5m)</button>
+        <button class="lt-btn" onclick="toggleLayer('deep_core',this)">Deep (0.2m)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANE: NUMERIC TELEMETRY TABLE & INSPECTOR -->
+  <div class="data-pane">
+    <div class="data-header">
+      <div class="pane-title">
+        <span>📋 Telemetry Node Inspector</span>
+      </div>
+      <div class="filter-tabs">
+        <button class="ftab active" onclick="filterTable('all',this)">All 75</button>
+        <button class="ftab" onclick="filterTable('surface',this)">Surface (25)</button>
+        <button class="ftab" onclick="filterTable('mid_level',this)">Mid (25)</button>
+        <button class="ftab" onclick="filterTable('deep_core',this)">Deep (25)</button>
+        <button class="ftab" onclick="filterTable('hotspot',this)" style="color:#f87171">⚠️ Hotspots</button>
+      </div>
+    </div>
+
+    <!-- Active Node Readout -->
+    <div class="inspector-card" id="nodeInspector">
+      <div class="ins-item">
+        <span class="ins-label">Selected Node</span>
+        <span class="ins-val" id="insId">DC-13 (Center)</span>
+      </div>
+      <div class="ins-item">
+        <span class="ins-label">Temperature</span>
+        <span class="ins-val" id="insTemp" style="color:#f87171">31.4°C</span>
+      </div>
+      <div class="ins-item">
+        <span class="ins-label">Humidity (% RH)</span>
+        <span class="ins-val" id="insRh">71.2%</span>
+      </div>
+      <div class="ins-item">
+        <span class="ins-label">CO₂ / Fungal Af</span>
+        <span class="ins-val" id="insAf" style="color:#facc15">1.84x (440ppm)</span>
+      </div>
+    </div>
+
+    <!-- Telemetry Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Node ID</th>
+            <th>Depth Layer</th>
+            <th>Grid (X,Y)</th>
+            <th>Temp (°C)</th>
+            <th>Humidity</th>
+            <th>CO₂</th>
+            <th>Af Factor</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="telemetryTbody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="data-footer">
+      <span>Continuous 1Hz Multi-Depth Telemetry Polling</span>
+      <span id="tableSummary">Showing 75 of 75 Sensor Nodes</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+//  SiloGuard — 3D Virtual Silo Engine (Split Screen WebGL / Canvas)
+// ═══════════════════════════════════════════════════════════════════
+'use strict';
+
+var GRID = 5;
+var ZONES = [
+  { name:'surface',   label:'Surface (3.0m)',   baseT:24.0, zOffset: 1.2 },
+  { name:'mid_level', label:'Mid-Level (1.5m)', baseT:27.0, zOffset: 0.0 },
+  { name:'deep_core', label:'Deep Core (0.2m)', baseT:30.5, zOffset:-1.2 },
+];
+
+var currentLang = 'en';
+var fansActive = false;
+var visibleLayer = 'all';
+var tableFilter = 'all';
+var selectedNodeKey = 'deep_core-2-2';
+
+var voxelsData = [];
+var tick = 0;
+
+/* ── Multilingual Speech ──────────────────────────────────────────── */
+var VOICE_DATA = {
+  en: { voiceLang: 'en-US', fansOn: 'Aeration cooling fans activated.', selectNode: 'Inspecting node at ' },
+  ta: { voiceLang: 'ta-IN', fansOn: 'காற்றோட்ட விசிறிகள் இயக்கப்பட்டுள்ளன.', selectNode: 'தானிய சென்சார் ஆய்வு: ' },
+  hi: { voiceLang: 'hi-IN', fansOn: 'वायु संचार पंखे चालू कर दिए गए हैं।', selectNode: 'सेंसर नोड का निरीक्षण: ' }
+};
+
+function speak(text) {
+  try {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = VOICE_DATA[currentLang].voiceLang;
+    u.rate = 0.95;
+    window.speechSynthesis.speak(u);
+  } catch(e){}
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.remove('active');});
+  var btn = document.getElementById('lang-' + lang);
+  if (btn) btn.classList.add('active');
+  if (lang === 'ta') speak('மொழி தமிழுக்கு மாற்றப்பட்டது.');
+  else if (lang === 'hi') speak('भाषा हिंदी में सेट की गई है।');
+  else speak('Language set to English.');
+}
+
+function toggleFan() {
+  fansActive = !fansActive;
+  var btn = document.getElementById('fanBtn');
+  var icon = document.getElementById('fanIcon');
+  var label = document.getElementById('fanLabel');
+  if (fansActive) {
+    btn.className = 'fan-btn active';
+    icon.className = 'animate-spin';
+    label.textContent = 'Fans Active (100%)';
+    speak(VOICE_DATA[currentLang].fansOn);
+  } else {
+    btn.className = 'fan-btn';
+    icon.className = '';
+    label.textContent = 'Turbo Fans';
+  }
+}
+
+/* ── Seeded Telemetry Generator ───────────────────────────────────── */
+function generateTelemetry(tickNum) {
+  var list = [];
+  var hotspotCount = 0;
+
+  ZONES.forEach(function(zone, zi) {
+    // Controlled thermal hotspot
+    var hx = 2, hy = 2; // Center core hotspot
+    var hasHotspot = (zone.name === 'deep_core') || ((tickNum % 4 === 0) && zone.name === 'mid_level');
+
+    for (var x = 0; x < GRID; x++) {
+      for (var y = 0; y < GRID; y++) {
+        var dist = Math.sqrt((x-hx)*(x-hx) + (y-hy)*(y-hy));
+        var temp = zone.baseT + (Math.sin(tickNum*0.2 + x*0.5 + y*0.7) * 0.8);
+        
+        if (hasHotspot) {
+          temp += Math.max(0, 9.5 * Math.exp(-0.7 * dist));
+        }
+        if (fansActive) {
+          temp -= 4.2; // Cooling effect
+        }
+
+        var isHotspot = temp >= 34.0;
+        if (isHotspot) hotspotCount++;
+
+        var rh = Math.min(88, Math.max(50, 60 + (temp - 24) * 1.8));
+        var co2 = Math.round(410 + (temp - 20) * 22);
+        var af = Math.max(1.0, Math.pow(temp/20, 1.8) * Math.pow(rh/60, 2.0));
+
+        var prefix = zone.name === 'surface' ? 'SF' : zone.name === 'mid_level' ? 'MD' : 'DC';
+        var nodeId = prefix + '-' + String(x * GRID + y + 1).padStart(2, '0');
+
+        list.push({
+          key: zone.name + '-' + x + '-' + y,
+          nodeId: nodeId,
+          zone: zone.name,
+          zoneLabel: zone.label,
+          zOffset: zone.zOffset,
+          x: x, y: y,
+          temperature: Math.round(temp * 10) / 10,
+          rh: Math.round(rh * 10) / 10,
+          co2: co2,
+          af: Math.round(af * 100) / 100,
+          hotspot: isHotspot
+        });
+      }
+    }
+  });
+
+  document.getElementById('hotspotCountBadge').textContent = hotspotCount + ' Hotspot' + (hotspotCount !== 1 ? 's' : '') + ' Detected';
+  return list;
+}
+
+/* ── Color Helper ─────────────────────────────────────────────────── */
+function getTempColor(t) {
+  // 18°C (Cyan) -> 26°C (Green) -> 32°C (Yellow) -> 38°C (Orange) -> 45°C (Red)
+  if (t < 24) return { rgb: [56, 189, 248], hex: '#38bdf8' };
+  if (t < 28) return { rgb: [52, 211, 153], hex: '#34d399' };
+  if (t < 33) return { rgb: [250, 204, 21], hex: '#facc15' };
+  if (t < 38) return { rgb: [251, 146, 60], hex: '#fb923c' };
+  return { rgb: [248, 113, 113], hex: '#f87171' };
+}
+
+/* ── 3D Canvas Renderer (Smooth 3D Orthographic projection) ───────── */
+var canvas3d = document.getElementById('silo3dCanvas');
+var ctx3d = canvas3d.getContext('2d');
+
+var angleX = 0.45;
+var angleY = 0.65;
+var isDragging = false;
+var lastMouseX = 0, lastMouseY = 0;
+
+// Mouse & Touch Orbit Controls (NO WHEEL ZOOM to keep view completely stable!)
+canvas3d.addEventListener('mousedown', function(e) {
+  isDragging = true;
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+});
+window.addEventListener('mouseup', function() { isDragging = false; });
+window.addEventListener('mousemove', function(e) {
+  if (!isDragging) return;
+  var dx = e.clientX - lastMouseX;
+  var dy = e.clientY - lastMouseY;
+  angleY += dx * 0.008;
+  angleX = Math.max(0.1, Math.min(1.2, angleX + dy * 0.008));
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+});
+
+// Touch support
+canvas3d.addEventListener('touchstart', function(e) {
+  if (e.touches.length === 1) {
+    isDragging = true;
+    lastMouseX = e.touches[0].clientX;
+    lastMouseY = e.touches[0].clientY;
+  }
+});
+canvas3d.addEventListener('touchmove', function(e) {
+  if (!isDragging || e.touches.length !== 1) return;
+  var dx = e.touches[0].clientX - lastMouseX;
+  var dy = e.touches[0].clientY - lastMouseY;
+  angleY += dx * 0.01;
+  angleX = Math.max(0.1, Math.min(1.2, angleX + dy * 0.01));
+  lastMouseX = e.touches[0].clientX;
+  lastMouseY = e.touches[0].clientY;
+  e.preventDefault();
+}, { passive: false });
+canvas3d.addEventListener('touchend', function() { isDragging = false; });
+
+// Project 3D point (x, y, z) to 2D canvas
+function project(x, y, z, cx, cy, scale) {
+  // Rotate around Y
+  var cosY = Math.cos(angleY), sinY = Math.sin(angleY);
+  var x1 = x * cosY - y * sinY;
+  var y1 = x * sinY + y * cosY;
+
+  // Rotate around X
+  var cosX = Math.cos(angleX), sinX = Math.sin(angleX);
+  var y2 = y1 * cosX - z * sinX;
+  var z2 = y1 * sinX + z * cosX;
+
+  return {
+    px: cx + x1 * scale,
+    py: cy + y2 * scale,
+    depth: z2
+  };
+}
+
+function render3DSilo() {
+  var W = canvas3d.offsetWidth || 500;
+  var H = canvas3d.offsetHeight || 400;
+  var dpr = window.devicePixelRatio || 1;
+  if (canvas3d.width !== W * dpr || canvas3d.height !== H * dpr) {
+    canvas3d.width = W * dpr;
+    canvas3d.height = H * dpr;
+  }
+  ctx3d.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx3d.clearRect(0, 0, W, H);
+
+  var cx = W * 0.5;
+  var cy = H * 0.52;
+  var scale = Math.min(W, H) * 0.17;
+
+  // 1. Draw Silo Cylindrical Wireframe & Cutaway Structure
+  ctx3d.save();
+  ctx3d.strokeStyle = 'rgba(51, 65, 85, 0.45)';
+  ctx3d.lineWidth = 1.2;
+
+  // Silo base aeration ring
+  var baseSteps = 32;
+  var siloR = 2.7;
+  var siloTopZ = 2.2, siloBottomZ = -2.0;
+
+  ctx3d.beginPath();
+  for (var i = 0; i <= baseSteps; i++) {
+    var th = (i / baseSteps) * Math.PI * 2;
+    var bx = Math.cos(th) * siloR;
+    var by = Math.sin(th) * siloR;
+    var p = project(bx, by, siloBottomZ, cx, cy, scale);
+    if (i === 0) ctx3d.moveTo(p.px, p.py); else ctx3d.lineTo(p.px, p.py);
+  }
+  ctx3d.stroke();
+
+  // Silo top ring & conical roof
+  ctx3d.beginPath();
+  for (var i = 0; i <= baseSteps; i++) {
+    var th = (i / baseSteps) * Math.PI * 2;
+    var tx = Math.cos(th) * siloR;
+    var ty = Math.sin(th) * siloR;
+    var p = project(tx, ty, siloTopZ, cx, cy, scale);
+    if (i === 0) ctx3d.moveTo(p.px, p.py); else ctx3d.lineTo(p.px, p.py);
+  }
+  ctx3d.stroke();
+
+  // Roof apex
+  var apex = project(0, 0, siloTopZ + 1.2, cx, cy, scale);
+  for (var i = 0; i < baseSteps; i += 8) {
+    var th = (i / baseSteps) * Math.PI * 2;
+    var p = project(Math.cos(th) * siloR, Math.sin(th) * siloR, siloTopZ, cx, cy, scale);
+    ctx3d.beginPath(); ctx3d.moveTo(apex.px, apex.py); ctx3d.lineTo(p.px, p.py);
+    ctx3d.strokeStyle = 'rgba(52, 211, 153, 0.25)';
+    ctx3d.stroke();
+  }
+
+  // Aeration Airflow particles if fans are active
+  if (fansActive) {
+    ctx3d.strokeStyle = 'rgba(249, 115, 22, 0.6)';
+    ctx3d.lineWidth = 1.5;
+    for (var f = 0; f < 8; f++) {
+      var fth = (f / 8) * Math.PI * 2 + (Date.now() * 0.003);
+      var fx = Math.cos(fth) * (siloR * 0.8);
+      var fy = Math.sin(fth) * (siloR * 0.8);
+      var p1 = project(fx, fy, siloBottomZ, cx, cy, scale);
+      var p2 = project(fx, fy, siloBottomZ + 0.8, cx, cy, scale);
+      ctx3d.beginPath(); ctx3d.moveTo(p1.px, p1.py); ctx3d.lineTo(p2.px, p2.py); ctx3d.stroke();
+    }
+  }
+  ctx3d.restore();
+
+  // 2. Sort Voxels by 3D depth for correct occlusion
+  var renderNodes = [];
+  voxelsData.forEach(function(v) {
+    if (visibleLayer !== 'all' && v.zone !== visibleLayer) return;
+    
+    // Center voxels around origin (-2 to +2)
+    var vx = (v.x - 2) * 0.9;
+    var vy = (v.y - 2) * 0.9;
+    var vz = v.zOffset;
+
+    var proj = project(vx, vy, vz, cx, cy, scale);
+    renderNodes.push({ voxel: v, proj: proj });
+  });
+
+  renderNodes.sort(function(a, b) { return a.proj.depth - b.proj.depth; });
+
+  // 3. Render 75 Voxels as glowing nodes with labels
+  renderNodes.forEach(function(item) {
+    var v = item.voxel;
+    var p = item.proj;
+    var colorInfo = getTempColor(v.temperature);
+    var isSelected = (v.key === selectedNodeKey);
+
+    // Glowing aura for hotspot
+    if (v.hotspot) {
+      ctx3d.save();
+      ctx3d.beginPath();
+      ctx3d.arc(p.px, p.py, 16, 0, Math.PI * 2);
+      ctx3d.fillStyle = 'rgba(239, 68, 68, 0.25)';
+      ctx3d.fill();
+      ctx3d.restore();
+    }
+
+    // Node sphere
+    ctx3d.save();
+    ctx3d.beginPath();
+    var nodeRadius = isSelected ? 9 : (v.hotspot ? 7.5 : 5.5);
+    ctx3d.arc(p.px, p.py, nodeRadius, 0, Math.PI * 2);
+    ctx3d.fillStyle = colorInfo.hex;
+    ctx3d.shadowColor = colorInfo.hex;
+    ctx3d.shadowBlur = isSelected ? 18 : 8;
+    ctx3d.fill();
+
+    if (isSelected) {
+      ctx3d.strokeStyle = '#ffffff';
+      ctx3d.lineWidth = 2.5;
+      ctx3d.stroke();
+    }
+    ctx3d.restore();
+
+    // Node temperature label
+    ctx3d.fillStyle = '#f8fafc';
+    ctx3d.font = 'bold 9px monospace';
+    ctx3d.textAlign = 'center';
+    ctx3d.textBaseline = 'bottom';
+    ctx3d.fillText(v.temperature.toFixed(0) + '°', p.px, p.py - 8);
+  });
+}
+
+/* ── Interactive Voxel Click Handler ──────────────────────────────── */
+canvas3d.addEventListener('click', function(e) {
+  var rect = canvas3d.getBoundingClientRect();
+  var mouseX = e.clientX - rect.left;
+  var mouseY = e.clientY - rect.top;
+
+  var W = canvas3d.offsetWidth || 500;
+  var H = canvas3d.offsetHeight || 400;
+  var cx = W * 0.5, cy = H * 0.52, scale = Math.min(W, H) * 0.17;
+
+  var closest = null;
+  var minDist = 24; // Pixel hit radius
+
+  voxelsData.forEach(function(v) {
+    if (visibleLayer !== 'all' && v.zone !== visibleLayer) return;
+    var vx = (v.x - 2) * 0.9, vy = (v.y - 2) * 0.9, vz = v.zOffset;
+    var p = project(vx, vy, vz, cx, cy, scale);
+    var d = Math.sqrt((mouseX - p.px)*(mouseX - p.px) + (mouseY - p.py)*(mouseY - p.py));
+    if (d < minDist) {
+      minDist = d;
+      closest = v;
+    }
+  });
+
+  if (closest) {
+    selectNode(closest.key);
+  }
+});
+
+function selectNode(key) {
+  selectedNodeKey = key;
+  var v = voxelsData.find(function(item){return item.key === key;});
+  if (!v) return;
+
+  // Update Inspector
+  document.getElementById('insId').textContent = v.nodeId + ' (' + v.zoneLabel + ')';
+  document.getElementById('insTemp').textContent = v.temperature.toFixed(1) + '°C';
+  document.getElementById('insTemp').style.color = getTempColor(v.temperature).hex;
+  document.getElementById('insRh').textContent = v.rh.toFixed(1) + '% RH';
+  document.getElementById('insAf').textContent = v.af.toFixed(2) + 'x (' + v.co2 + ' ppm)';
+
+  // Speak node inspection
+  speak(VOICE_DATA[currentLang].selectNode + v.nodeId + ', ' + v.temperature.toFixed(0) + ' degrees.');
+
+  // Highlight table row
+  renderTable();
+  var row = document.getElementById('row-' + v.key);
+  if (row) row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ── Render Structured Telemetry Table ────────────────────────────── */
+function renderTable() {
+  var tbody = document.getElementById('telemetryTbody');
+  if (!tbody) return;
+
+  var filtered = voxelsData.filter(function(v) {
+    if (tableFilter === 'all') return true;
+    if (tableFilter === 'hotspot') return v.hotspot;
+    return v.zone === tableFilter;
+  });
+
+  document.getElementById('tableSummary').textContent = 'Showing ' + filtered.length + ' of ' + voxelsData.length + ' Sensor Nodes';
+
+  tbody.innerHTML = filtered.map(function(v) {
+    var isSel = (v.key === selectedNodeKey);
+    var color = getTempColor(v.temperature);
+    var statusClass = v.hotspot ? 'status-danger' : (v.temperature >= 29 ? 'status-warn' : 'status-safe');
+    var statusLabel = v.hotspot ? '⚠️ HOTSPOT' : (v.temperature >= 29 ? 'ELEVATED' : 'NOMINAL');
+
+    return '<tr id="row-' + v.key + '" class="' + (isSel ? 'selected' : '') + '" onclick="selectNode(\'' + v.key + '\')">'
+      + '<td style="font-weight:bold;color:#f8fafc">' + v.nodeId + '</td>'
+      + '<td style="color:#94a3b8">' + v.zoneLabel + '</td>'
+      + '<td style="font-family:monospace">(' + v.x + ',' + v.y + ')</td>'
+      + '<td><span class="temp-badge" style="background:' + color.hex + '22;color:' + color.hex + ';border:1px solid ' + color.hex + '66">' + v.temperature.toFixed(1) + '°C</span></td>'
+      + '<td style="color:#cbd5e1">' + v.rh.toFixed(1) + '%</td>'
+      + '<td style="color:#94a3b8">' + v.co2 + ' ppm</td>'
+      + '<td style="font-weight:bold;color:' + (v.af > 2.5 ? '#f87171' : '#34d399') + '">' + v.af.toFixed(2) + 'x</td>'
+      + '<td><span class="status-badge ' + statusClass + '">' + statusLabel + '</span></td>'
+      + '</tr>';
+  }).join('');
+}
+
+function filterTable(filter, btn) {
+  tableFilter = filter;
+  document.querySelectorAll('.ftab').forEach(function(b){b.classList.remove('active');});
+  if (btn) btn.classList.add('active');
+  renderTable();
+}
+
+function toggleLayer(layer, btn) {
+  visibleLayer = layer;
+  document.querySelectorAll('.lt-btn').forEach(function(b){b.classList.remove('active');});
+  if (btn) btn.classList.add('active');
+}
+
+/* ── Main 1Hz Telemetry Loop & Animation ──────────────────────────── */
+function updateLoop() {
+  tick++;
+  voxelsData = generateTelemetry(tick);
+  renderTable();
+}
+
+function animLoop() {
+  render3DSilo();
+  requestAnimationFrame(animLoop);
+}
+
+// Initial Boot
+voxelsData = generateTelemetry(0);
+selectNode('deep_core-2-2');
+renderTable();
+setInterval(updateLoop, 1000);
+animLoop();
+</script>
+</body>
+</html>

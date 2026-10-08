@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
+<title>SiloGuard Master — Unified 60% Grain Twin & 40% Biofuel Facility</title>
+<style>
+/* ── Reset & Core ──────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+html,body{width:100%;height:100%;overflow-x:hidden;background:#060a12;color:#e2e8f0;font-family:'JetBrains Mono',Consolas,monospace;font-size:13px}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#090d16}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+button{cursor:pointer;font-family:inherit;border:none}
+
+/* ── Top Header ────────────────────────────────────────────────────── */
+.topbar{
+  position:sticky;top:0;z-index:60;height:58px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1rem;background:rgba(9,13,22,.96);border-bottom:1px solid rgba(52,211,153,.25);
+  box-shadow:0 4px 20px rgba(0,0,0,.7);backdrop-filter:blur(16px);
+}
+.brand{display:flex;align-items:center;gap:.6rem}
+.brand-icon{
+  width:34px;height:34px;border-radius:.5rem;background:rgba(16,185,129,.15);border:1.5px solid #34d399;
+  display:flex;align-items:center;justify-content:center;color:#34d399;box-shadow:0 0 12px rgba(52,211,153,.4);
+}
+.brand-name{font-size:1.1rem;font-weight:900;color:#f8fafc;letter-spacing:.02em}
+
+/* ── MASTER MODE SELECTOR (40% vs 60% vs 3D Silo) ─────────────────── */
+.mode-switcher{
+  display:inline-flex;align-items:center;background:rgba(2,6,23,.9);
+  padding:3px;border-radius:.65rem;border:1px solid #334155;gap:3px;
+}
+.mode-btn{
+  display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .75rem;border-radius:.5rem;
+  font-size:.68rem;font-weight:700;color:#94a3b8;transition:all .2s;white-space:nowrap;
+}
+.mode-btn:hover{color:#f8fafc;background:rgba(51,65,85,.4)}
+.mode-btn.active{
+  background:#34d399;color:#060a12;font-weight:900;box-shadow:0 0 15px rgba(52,211,153,.6);
+}
+.mode-btn.btn-40.active{
+  background:#06b6d4;color:#021118;box-shadow:0 0 15px rgba(6,182,212,.7);
+}
+
+.topbar-right{display:flex;align-items:center;gap:.6rem}
+.lang-select{display:inline-flex;background:rgba(2,6,23,.8);border:1px solid #334155;border-radius:.45rem;padding:2px}
+.lang-btn{padding:.2rem .45rem;border-radius:.35rem;font-size:.62rem;font-weight:700;color:#94a3b8;transition:all .2s}
+.lang-btn.active{background:#34d399;color:#090d16;font-weight:800}
+
+/* ── Common Utilities & Voice Banner ──────────────────────────────── */
+.voice-banner{
+  height:30px;background:rgba(2,6,23,.9);border-bottom:1px solid rgba(51,65,85,.5);
+  display:flex;align-items:center;padding:0 1.25rem;gap:.6rem;font-size:.68rem;color:#94a3b8;
+}
+.voice-tag{padding:.1rem .4rem;border-radius:.3rem;background:rgba(52,211,153,.15);border:1px solid #34d399;color:#34d399;font-weight:800;font-size:.55rem;text-transform:uppercase}
+
+.view-container{width:100%;min-height:calc(100vh - 88px)}
+.view-panel{display:none;width:100%}
+.view-panel.active{display:block}
+
+/* ════════════════════════════════════════════════════════════════════
+   VIEW 1: 60% CORE GRAIN SILO DIGITAL TWIN STYLING
+   ════════════════════════════════════════════════════════════════════ */
+.kpi-row{display:flex;gap:.75rem;padding:.85rem 1.25rem;overflow-x:auto}
+.kpi-card{
+  flex:1;min-width:140px;background:rgba(15,23,42,.65);border:1px solid rgba(51,65,85,.6);
+  padding:.85rem;border-radius:.85rem;display:flex;flex-direction:column;gap:.25rem;
+  box-shadow:0 4px 16px rgba(0,0,0,.4);
+}
+.kpi-head{font-size:.6rem;color:#94a3b8;text-transform:uppercase;font-weight:700}
+.kpi-val{font-size:1.5rem;font-weight:900;color:#34d399}
+.kpi-sub{font-size:.62rem;font-weight:700;text-transform:uppercase}
+
+.twin-grid{display:grid;grid-template-columns:1fr;gap:1.25rem;padding:0 1.25rem 1.25rem}
+@media(min-width:1024px){.twin-grid{grid-template-columns:2fr 1fr}}
+.twin-panel{
+  background:rgba(15,23,42,.65);border:1px solid rgba(51,65,85,.6);border-radius:1rem;
+  overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.5);
+}
+.panel-head{padding:.75rem 1rem;background:rgba(15,23,42,.8);border-bottom:1px solid rgba(51,65,85,.5);display:flex;align-items:center;justify-content:space-between}
+.panel-title{font-size:.72rem;font-weight:800;text-transform:uppercase;color:#e2e8f0}
+#twinCanvas{width:100%;height:380px;display:block;background:#05070d}
+
+/* ════════════════════════════════════════════════════════════════════
+   VIEW 2: 40% BIOFUEL & CLEAN ENERGY FACILITY STYLING
+   ════════════════════════════════════════════════════════════════════ */
+.bio-hero{
+  padding:1.25rem;background:linear-gradient(180deg, rgba(8,51,68,.3) 0%, rgba(2,17,24,.8) 100%);
+  border-bottom:1px solid rgba(6,182,212,.3);display:grid;grid-template-columns:1fr;gap:1rem;
+}
+@media(min-width:900px){.bio-hero{grid-template-columns:3fr 1fr}}
+.bio-card-main{
+  background:rgba(6,30,42,.8);border:2px solid #06b6d4;border-radius:1rem;padding:1.25rem;
+  box-shadow:0 0 30px rgba(6,182,212,.2);display:flex;flex-direction:column;gap:.5rem;
+}
+.bio-dial-row{display:grid;grid-template-columns:repeat(auto-fit, minmax(180px,1fr));gap:.85rem;padding:1.25rem}
+.dial-box{
+  background:rgba(4,22,32,.8);border:1px solid rgba(6,182,212,.3);border-radius:.85rem;
+  padding:1rem;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.4rem;
+}
+.dial-circle{
+  width:90px;height:90px;border-radius:50%;border:3px solid rgba(6,182,212,.2);
+  border-top-color:#06b6d4;border-right-color:#38bdf8;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+#bioCanvas{width:100%;height:340px;display:block;background:#020b10}
+
+/* ════════════════════════════════════════════════════════════════════
+   VIEW 3: 3D VIRTUAL SILO & 75-VOXEL TABLE STYLING
+   ════════════════════════════════════════════════════════════════════ */
+.split-view{display:flex;flex-direction:column;height:calc(100vh - 88px)}
+@media(min-width:900px){.split-view{flex-direction:row}}
+.split-left{flex:1.1;background:#04070e;border-right:1px solid rgba(51,65,85,.5);position:relative}
+.split-right{flex:.9;background:#090d16;display:flex;flex-direction:column;overflow:hidden}
+#silo3dCanvas{width:100%;height:100%;display:block}
+.table-wrap{flex:1;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:.65rem;text-align:left}
+th{position:sticky;top:0;background:#0e1526;color:#94a3b8;padding:.45rem .6rem;border-bottom:1px solid #334155}
+td{padding:.4rem .6rem;border-bottom:1px solid rgba(51,65,85,.3);white-space:nowrap}
+tr:hover{background:rgba(52,211,153,.1);cursor:pointer}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- ── MASTER UNIFIED HEADER ── -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <span class="brand-name">SiloGuard</span>
+  </div>
+
+  <!-- 🎯 MASTER OPTION SWITCHER: 60% vs 40% vs 3D Silo -->
+  <div class="mode-switcher">
+    <button class="mode-btn active" id="btn-mode-60" onclick="switchMode('view-60', this)">
+      <span>🌾</span>
+      <span>60% Grain Silo Twin</span>
+    </button>
+    <button class="mode-btn btn-40" id="btn-mode-40" onclick="switchMode('view-40', this)">
+      <span>⚡</span>
+      <span>40% Biofuel Facility</span>
+    </button>
+    <button class="mode-btn" id="btn-mode-silo" onclick="switchMode('view-silo', this)">
+      <span>🏛️</span>
+      <span>75-Voxel 3D Grid</span>
+    </button>
+  </div>
+
+  <!-- Language & Voice -->
+  <div class="topbar-right">
+    <div class="lang-select">
+      <button class="lang-btn active" id="l-en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="l-ta" onclick="setLang('ta')">தமிழ்</button>
+      <button class="lang-btn" id="l-hi" onclick="setLang('hi')">हिन्दी</button>
+    </div>
+  </div>
+</header>
+
+<!-- ── LIVE MULTILINGUAL VOICE CAPTION ── -->
+<div class="voice-banner">
+  <span class="voice-tag" id="vLang">English</span>
+  <span id="vCaption" style="truncate italic">SiloGuard Unified System Active. Select 60% or 40% option from the header.</span>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     VIEW 1: 🌾 60% CORE GRAIN SILO DIGITAL TWIN
+     ════════════════════════════════════════════════════════════════════ -->
+<section class="view-panel active" id="view-60">
+  <div class="kpi-row">
+    <div class="kpi-card" style="border-color:rgba(52,211,153,.5)">
+      <span class="kpi-head">Safe Storage Time</span>
+      <span class="kpi-val" id="k60-srem">462.8</span>
+      <span class="kpi-sub" style="color:#34d399">Hours Remaining</span>
+    </div>
+    <div class="kpi-card" style="border-color:rgba(56,189,248,.5)">
+      <span class="kpi-head">Core Hotspot Temp</span>
+      <span class="kpi-val" style="color:#38bdf8" id="k60-temp">26.4°C</span>
+      <span class="kpi-sub" style="color:#38bdf8">Nominal Range</span>
+    </div>
+    <div class="kpi-card" style="border-color:rgba(250,204,21,.5)">
+      <span class="kpi-head">Fungal Spore (Af)</span>
+      <span class="kpi-val" style="color:#facc15" id="k60-af">1.12x</span>
+      <span class="kpi-sub" style="color:#facc15">Baseline Kinetics</span>
+    </div>
+    <div class="kpi-card" style="border-color:rgba(249,115,22,.5)">
+      <span class="kpi-head">Turbo Fan State</span>
+      <span class="kpi-val" style="color:#fb923c" id="k60-fan">READY</span>
+      <span class="kpi-sub" style="color:#fb923c">Auto-Trigger @ 150h</span>
+    </div>
+  </div>
+
+  <div class="twin-grid">
+    <div class="twin-panel">
+      <div class="panel-head">
+        <span class="panel-title">Silo #4 · 3D Multi-Depth Telemetry Heatmap</span>
+        <button onclick="trigger60Crisis()" style="background:#ef4444;color:#fff;font-size:.62rem;font-weight:800;padding:.25rem .6rem;border-radius:.35rem">⚡ Trigger Crisis</button>
+      </div>
+      <canvas id="twinCanvas"></canvas>
+    </div>
+
+    <div class="twin-panel" style="display:flex;flex-direction:column">
+      <div class="panel-head">
+        <span class="panel-title">Autonomous Action Feed</span>
+        <span style="font-size:.6rem;color:#34d399;font-weight:700">1Hz Telemetry</span>
+      </div>
+      <div style="flex:1;padding:.85rem;display:flex;flex-direction:column;gap:.5rem;overflow-y:auto;max-height:340px" id="feed60">
+        <div style="padding:.5rem;border-radius:.4rem;background:rgba(6,78,59,.3);border-left:3px solid #34d399;font-size:.68rem">
+          🛡️ Digital Twin Active — 75 Voxels Streaming Core Telemetry
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     VIEW 2: ⚡ 40% BIOFUEL & CLEAN ENERGY POWER PLANT
+     ════════════════════════════════════════════════════════════════════ -->
+<section class="view-panel" id="view-40">
+  <div class="bio-hero">
+    <div class="bio-card-main">
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <span style="width:8px;height:8px;border-radius:50%;background:#06b6d4;animation:pulse 1s infinite"></span>
+        <span style="font-size:.65rem;color:#38bdf8;font-weight:800;text-transform:uppercase">40% Biofuel Diversion Subsystem</span>
+      </div>
+      <h2 style="font-size:1.4rem;font-weight:900;color:#f0fdfa">Anaerobic Methane Digester & Turbine Facility</h2>
+      <p style="font-size:.75rem;color:#94a3b8;line-height:1.45">
+        When irreversible spoilage is detected in the silo, 40% of the damaged grain biomass is automatically diverted into this thermophilic digester to generate clean electricity and heating fuel.
+      </p>
+    </div>
+    <div class="bio-card-main" style="border-color:#34d399;background:rgba(6,78,59,.3);justify-content:center">
+      <span style="font-size:.62rem;color:#94a3b8;text-transform:uppercase;font-weight:800">Carbon Offset Mitigated</span>
+      <div style="font-size:1.8rem;font-weight:900;color:#34d399">1.85 Tons</div>
+      <span style="font-size:.62rem;color:#a7f3d0">CO₂e Atmospheric Release Prevented</span>
+    </div>
+  </div>
+
+  <div class="bio-dial-row">
+    <div class="dial-box">
+      <div class="dial-circle"><span style="font-size:1.4rem;font-weight:900;color:#06b6d4">64%</span><span style="font-size:.6rem;color:#38bdf8">CH₄</span></div>
+      <span style="font-size:.65rem;font-weight:800;color:#94a3b8;text-transform:uppercase">Methane Quality</span>
+    </div>
+    <div class="dial-box">
+      <div class="dial-circle" style="border-top-color:#34d399"><span style="font-size:1.4rem;font-weight:900;color:#34d399">42.8</span><span style="font-size:.6rem;color:#34d399">m³/h</span></div>
+      <span style="font-size:.65rem;font-weight:800;color:#94a3b8;text-transform:uppercase">Biogas Flow Velocity</span>
+    </div>
+    <div class="dial-box">
+      <div class="dial-circle" style="border-top-color:#facc15"><span style="font-size:1.4rem;font-weight:900;color:#facc15">38.2°</span><span style="font-size:.6rem;color:#facc15">°C</span></div>
+      <span style="font-size:.65rem;font-weight:800;color:#94a3b8;text-transform:uppercase">Digester Core Temp</span>
+    </div>
+    <div class="dial-box">
+      <div class="dial-circle" style="border-top-color:#a78bfa"><span style="font-size:1.4rem;font-weight:900;color:#a78bfa">18.5</span><span style="font-size:.6rem;color:#a78bfa">kW</span></div>
+      <span style="font-size:.65rem;font-weight:800;color:#94a3b8;text-transform:uppercase">Turbine Electricity</span>
+    </div>
+  </div>
+
+  <div style="padding:0 1.25rem 1.25rem">
+    <div class="twin-panel" style="border-color:#06b6d4">
+      <div class="panel-head" style="background:rgba(6,30,42,.9)">
+        <span class="panel-title" style="color:#06b6d4">⚡ Live Anaerobic Fermentation Vessel & Slurry Circulation</span>
+        <button onclick="injectBiofuel()" style="background:#0891b2;color:#fff;font-size:.62rem;font-weight:800;padding:.25rem .6rem;border-radius:.35rem">⚡ Actuate Manifold</button>
+      </div>
+      <canvas id="bioCanvas"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     VIEW 3: 🏛️ 3D VIRTUAL SILO & 75-VOXEL TABLE
+     ════════════════════════════════════════════════════════════════════ -->
+<section class="view-panel" id="view-silo">
+  <div class="split-view">
+    <div class="split-left">
+      <canvas id="silo3dCanvas"></canvas>
+      <div style="position:absolute;bottom:.75rem;left:.75rem;font-size:.62rem;color:#64748b;background:rgba(9,13,22,.8);padding:.25rem .5rem;border-radius:.35rem;border:1px solid #334155">
+        🖱️ Drag to Rotate 360° · Stable Zero-Zoom View
+      </div>
+    </div>
+    <div class="split-right">
+      <div class="panel-head">
+        <span class="panel-title">📋 Numeric Telemetry Table (75 Voxels)</span>
+        <span style="font-size:.6rem;color:#34d399;font-weight:800">All 3 Strata</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Node ID</th>
+              <th>Layer</th>
+              <th>Coord</th>
+              <th>Temp</th>
+              <th>RH</th>
+              <th>CO₂</th>
+              <th>Af</th>
+            </tr>
+          </thead>
+          <tbody id="siloTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+'use strict';
+
+// ── MASTER MODE SWITCHER ───────────────────────────────────────────
+var currentMode = 'view-60';
+var currentLang = 'en';
+
+function switchMode(modeId, btn) {
+  currentMode = modeId;
+  document.querySelectorAll('.view-panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.mode-btn').forEach(function(b){b.classList.remove('active');});
+  
+  var panel = document.getElementById(modeId);
+  if (panel) panel.classList.add('active');
+  if (btn) btn.classList.add('active');
+
+  // Trigger resize updates for canvases
+  setTimeout(function() {
+    if (modeId === 'view-60') renderTwinHeatmap();
+    else if (modeId === 'view-40') renderBioVessel();
+    else if (modeId === 'view-silo') render3DSilo();
+  }, 50);
+
+  // Announce in voice
+  if (modeId === 'view-60') speakAlert('mode60');
+  else if (modeId === 'view-40') speakAlert('mode40');
+  else speakAlert('modeSilo');
+}
+
+// ── MULTILINGUAL VOICE ENGINE ──────────────────────────────────────
+var VOICE_DATA = {
+  en: {
+    lang: 'en-US',
+    mode60: 'Viewing 60% Core Grain Silo Digital Twin.',
+    mode40: 'Switched to 40% Biofuel and Clean Energy Facility.',
+    modeSilo: 'Inspecting 3D Virtual Silo 75-voxel telemetry table.',
+    crisis: 'Warning: Core thermal runaway detected. Turbo aeration fans engaged.'
+  },
+  ta: {
+    lang: 'ta-IN',
+    mode60: '60 சதவீத தானியக் களஞ்சிய டிஜிட்டல் இரட்டை முறை திறக்கப்பட்டது.',
+    mode40: '40 சதவீத உயிரி எரிபொருள் மின் நிலையத்திற்கு மாற்றப்பட்டது.',
+    modeSilo: '75 சென்சார் புள்ளிகள் கொண்ட 3D களஞ்சிய அட்டவணை திறக்கப்பட்டது.',
+    crisis: 'எச்சரிக்கை: களஞ்சியத்தில் அதிக வெப்பம் கண்டறியப்பட்டுள்ளது. விசிறிகள் இயக்கப்பட்டுள்ளன.'
+  },
+  hi: {
+    lang: 'hi-IN',
+    mode60: '60 प्रतिशत अनाज साइलो डिजिटल ट्विन मोड सक्रिय।',
+    mode40: '40 प्रतिशत जैव ईंधन विद्युत संयंत्र में स्विच किया गया।',
+    modeSilo: '75 वोक्सेल 3D साइलो टेलीमेट्री तालिका खोली गई।',
+    crisis: 'चेतावनी: साइलो में अत्यधिक तापमान बढ़ गया है। पंखे चालू कर दिए गए हैं।'
+  }
+};
+
+function speakAlert(key) {
+  var data = VOICE_DATA[currentLang] || VOICE_DATA.en;
+  var text = data[key] || VOICE_DATA.en[key];
+  document.getElementById('vLang').textContent = currentLang.toUpperCase();
+  document.getElementById('vCaption').textContent = text;
+  try {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = data.lang;
+    u.rate = 0.95;
+    window.speechSynthesis.speak(u);
+  } catch(e){}
+}
+
+function setLang(l) {
+  currentLang = l;
+  document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.remove('active');});
+  var btn = document.getElementById('l-' + l);
+  if (btn) btn.classList.add('active');
+  speakAlert('mode60');
+}
+
+// ── VIEW 1: 60% TWIN CANVAS RENDERER ───────────────────────────────
+var twinCanvas = document.getElementById('twinCanvas');
+var twinCtx = twinCanvas.getContext('2d');
+var tick60 = 0;
+
+function renderTwinHeatmap() {
+  if (currentMode !== 'view-60') return;
+  var W = twinCanvas.offsetWidth || 500, H = twinCanvas.offsetHeight || 380;
+  var dpr = window.devicePixelRatio || 1;
+  if (twinCanvas.width !== W * dpr || twinCanvas.height !== H * dpr) {
+    twinCanvas.width = W * dpr; twinCanvas.height = H * dpr;
+  }
+  twinCtx.setTransform(dpr,0,0,dpr,0,0);
+  twinCtx.clearRect(0,0,W,H);
+
+  var GRID = 5;
+  var cellW = (W - 80) / GRID, cellH = (H - 60) / 3 / GRID;
+  var ZONES = ['Surface (3.0m)', 'Mid-Level (1.5m)', 'Deep Core (0.2m)'];
+
+  ZONES.forEach(function(z, zi) {
+    var yBase = 20 + zi * (cellH * GRID + 20);
+    twinCtx.fillStyle = '#64748b'; twinCtx.font = 'bold 9px monospace';
+    twinCtx.fillText(z, 40, yBase - 4);
+
+    for (var x = 0; x < GRID; x++) {
+      for (var y = 0; y < GRID; y++) {
+        var temp = 24 + zi * 3 + Math.sin(tick60 * 0.1 + x + y) * 1.5;
+        twinCtx.fillStyle = temp > 30 ? '#ef4444' : temp > 27 ? '#f97316' : '#34d399';
+        twinCtx.fillRect(40 + x * cellW, yBase + y * cellH, cellW - 2, cellH - 2);
+      }
+    }
+  });
+}
+
+function trigger60Crisis() {
+  speakAlert('crisis');
+  var f = document.getElementById('feed60');
+  var d = document.createElement('div');
+  d.style.cssText = 'padding:.5rem;border-radius:.4rem;background:rgba(239,68,68,.3);border-left:3px solid #ef4444;font-size:.68rem';
+  d.textContent = '🚨 CRISIS TRIGGERED: Deep Core hotspot surging! Turbo fans active.';
+  f.prepend(d);
+}
+
+// ── VIEW 2: 40% BIOFUEL VESSEL RENDERER ────────────────────────────
+var bioCanvas = document.getElementById('bioCanvas');
+var bioCtx = bioCanvas.getContext('2d');
+var bioBubbles = [];
+for (var i = 0; i < 40; i++) {
+  bioBubbles.push({ x: 0, y: 0, r: 2 + Math.random() * 4, speed: 1 + Math.random() * 2 });
+}
+
+function renderBioVessel() {
+  if (currentMode !== 'view-40') return;
+  var W = bioCanvas.offsetWidth || 600, H = bioCanvas.offsetHeight || 340;
+  var dpr = window.devicePixelRatio || 1;
+  if (bioCanvas.width !== W * dpr || bioCanvas.height !== H * dpr) {
+    bioCanvas.width = W * dpr; bioCanvas.height = H * dpr;
+  }
+  bioCtx.setTransform(dpr,0,0,dpr,0,0);
+  bioCtx.clearRect(0,0,W,H);
+
+  var cx = W * 0.5, cy = 180, rDome = 100;
+  bioCtx.fillStyle = '#04222a'; bioCtx.strokeStyle = '#06b6d4'; bioCtx.lineWidth = 3;
+  bioCtx.beginPath(); bioCtx.arc(cx, cy, rDome, Math.PI, 0); bioCtx.lineTo(cx+rDome, cy+70); bioCtx.lineTo(cx-rDome, cy+70); bioCtx.closePath();
+  bioCtx.fill(); bioCtx.stroke();
+
+  bioCtx.fillStyle = '#f8fafc'; bioCtx.font = 'bold 12px monospace'; bioCtx.textAlign = 'center';
+  bioCtx.fillText('40% ANAEROBIC BIO-DIGESTER', cx, cy + 15);
+  bioCtx.fillStyle = '#38bdf8'; bioCtx.font = '9px monospace';
+  bioCtx.fillText('Thermophilic Methane Generation (64%)', cx, cy + 32);
+
+  // Bubbles
+  bioBubbles.forEach(function(b) {
+    if (b.x === 0 && b.y === 0) { b.x = (cx - rDome + 15) + Math.random() * (rDome * 2 - 30); b.y = cy + 50; }
+    b.y -= b.speed;
+    if (b.y < cy - 30) { b.x = (cx - rDome + 15) + Math.random() * (rDome * 2 - 30); b.y = cy + 50; }
+    bioCtx.fillStyle = '#06b6d4'; bioCtx.beginPath(); bioCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2); bioCtx.fill();
+  });
+}
+
+function injectBiofuel() {
+  speakAlert('mode40');
+  alert('⚡ Manifold Injected!\n4.2 Tons of damaged grain routed to anaerobic bio-digester.');
+}
+
+// ── VIEW 3: 3D VIRTUAL SILO & TABLE RENDERER ───────────────────────
+var silo3dCanvas = document.getElementById('silo3dCanvas');
+var silo3dCtx = silo3dCanvas.getContext('2d');
+var sAngleX = 0.45, sAngleY = 0.65, sDragging = false, sLastX = 0, sLastY = 0;
+
+silo3dCanvas.addEventListener('mousedown', function(e){ sDragging = true; sLastX = e.clientX; sLastY = e.clientY; });
+window.addEventListener('mouseup', function(){ sDragging = false; });
+window.addEventListener('mousemove', function(e){
+  if (!sDragging) return;
+  sAngleY += (e.clientX - sLastX) * 0.008;
+  sAngleX = Math.max(0.1, Math.min(1.2, sAngleX + (e.clientY - sLastY) * 0.008));
+  sLastX = e.clientX; sLastY = e.clientY;
+});
+
+function render3DSilo() {
+  if (currentMode !== 'view-silo') return;
+  var W = silo3dCanvas.offsetWidth || 400, H = silo3dCanvas.offsetHeight || 400;
+  var dpr = window.devicePixelRatio || 1;
+  if (silo3dCanvas.width !== W * dpr || silo3dCanvas.height !== H * dpr) {
+    silo3dCanvas.width = W * dpr; silo3dCanvas.height = H * dpr;
+  }
+  silo3dCtx.setTransform(dpr,0,0,dpr,0,0);
+  silo3dCtx.clearRect(0,0,W,H);
+
+  var cx = W * 0.5, cy = H * 0.52, scale = Math.min(W, H) * 0.18;
+
+  function proj(x, y, z) {
+    var cosY = Math.cos(sAngleY), sinY = Math.sin(sAngleY);
+    var x1 = x * cosY - y * sinY, y1 = x * sinY + y * cosY;
+    var cosX = Math.cos(sAngleX), sinX = Math.sin(sAngleX);
+    var y2 = y1 * cosX - z * sinX;
+    return { px: cx + x1 * scale, py: cy + y2 * scale };
+  }
+
+  // Draw 3 layers of nodes
+  var Z_OFFS = [1.2, 0.0, -1.2];
+  Z_OFFS.forEach(function(zo, zi) {
+    for (var x = 0; x < 5; x++) {
+      for (var y = 0; y < 5; y++) {
+        var p = proj((x - 2) * 0.9, (y - 2) * 0.9, zo);
+        silo3dCtx.fillStyle = zi === 2 ? '#ef4444' : zi === 1 ? '#f97316' : '#34d399';
+        silo3dCtx.beginPath(); silo3dCtx.arc(p.px, p.py, 5, 0, Math.PI * 2); silo3dCtx.fill();
+      }
+    }
+  });
+}
+
+function populateSiloTable() {
+  var tbody = document.getElementById('siloTbody');
+  if (!tbody) return;
+  var html = '';
+  var ZONES = [{n:'SF',l:'Surface'},{n:'MD',l:'Mid'},{n:'DC',l:'Deep'}];
+  ZONES.forEach(function(z, zi) {
+    for (var i = 1; i <= 25; i++) {
+      var t = (24 + zi * 3.2 + Math.random() * 1.5).toFixed(1);
+      html += '<tr><td><strong>' + z.n + '-' + String(i).padStart(2,'0') + '</strong></td><td>' + z.l + '</td><td>(' + (i%5) + ',' + Math.floor(i/5) + ')</td><td style="color:#34d399">' + t + '°C</td><td>62%</td><td>420</td><td>1.1x</td></tr>';
+    }
+  });
+  tbody.innerHTML = html;
+}
+
+// ── GLOBAL ANIMATION LOOP ──────────────────────────────────────────
+function mainLoop() {
+  tick60++;
+  if (currentMode === 'view-60') renderTwinHeatmap();
+  else if (currentMode === 'view-40') renderBioVessel();
+  else if (currentMode === 'view-silo') render3DSilo();
+  requestAnimationFrame(mainLoop);
+}
+
+populateSiloTable();
+mainLoop();
+</script>
+</body>
+</html>
