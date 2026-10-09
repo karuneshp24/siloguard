@@ -4,106 +4,376 @@
 <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
-<title>SiloGuard — Master Unified Agritech Platform</title>
+<title>SiloGuard — Master Unified Agritech & Bio-Energy Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
+/* ── Reset & Theme Variables ───────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
-html,body{width:100%;height:100%;overflow:hidden;background:#060a12;color:#e2e8f0;font-family:'JetBrains Mono',Consolas,monospace;font-size:13px}
-button{cursor:pointer;font-family:inherit;border:none}
+:root{
+  --bg-deep:#050811;
+  --bg-surface:rgba(10,16,28,0.92);
+  --border-glow:rgba(52,211,153,0.3);
+  --primary-glow:#34d399;
+  --primary-accent:#10b981;
+  --primary-glow-box:rgba(52,211,153,0.4);
+  --cyan-accent:#06b6d4;
+  --violet-accent:#a78bfa;
+  --gold-accent:#f59e0b;
+  --danger-accent:#ef4444;
+  --text-main:#f8fafc;
+  --text-sub:#94a3b8;
+  --header-bg:rgba(7,12,22,0.95);
+  --tab-active-bg:#34d399;
+  --tab-active-text:#04140e;
+}
 
-/* ── Master Navigation Bar ─────────────────────────────────────────── */
+/* Theme 1: Emerald Quantum (Default Agritech) */
+body.theme-emerald {
+  --primary-glow:#34d399;
+  --primary-accent:#10b981;
+  --border-glow:rgba(52,211,153,0.35);
+  --primary-glow-box:rgba(52,211,153,0.35);
+  --tab-active-bg:#34d399;
+  --tab-active-text:#04140e;
+}
+
+/* Theme 2: Cyber-Cyan Bio-Energy */
+body.theme-cyan {
+  --primary-glow:#38bdf8;
+  --primary-accent:#06b6d4;
+  --border-glow:rgba(6,182,212,0.45);
+  --primary-glow-box:rgba(6,182,212,0.4);
+  --tab-active-bg:#06b6d4;
+  --tab-active-text:#02151d;
+}
+
+/* Theme 3: Obsidian Gold / Executive Demo */
+body.theme-gold {
+  --primary-glow:#fbbf24;
+  --primary-accent:#f59e0b;
+  --border-glow:rgba(245,158,11,0.45);
+  --primary-glow-box:rgba(245,158,11,0.4);
+  --tab-active-bg:#f59e0b;
+  --tab-active-text:#1c1002;
+}
+
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  background:var(--bg-deep);color:var(--text-main);
+  font-family:'Outfit','JetBrains Mono',system-ui,sans-serif;
+  font-size:13px;
+}
+button, a{cursor:pointer;font-family:inherit;border:none;text-decoration:none}
+
+/* ── Live Telemetry Presentation Ticker ────────────────────────────── */
+.presentation-ticker{
+  height:24px;background:rgba(2,6,15,0.98);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1rem;font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:#94a3b8;overflow:hidden;position:relative;z-index:110;
+}
+.ticker-content{
+  display:flex;align-items:center;gap:1.5rem;overflow:hidden;white-space:nowrap;
+  animation:tickerScroll 35s linear infinite;
+}
+.ticker-content:hover{animation-play-state:paused}
+@keyframes tickerScroll{
+  0%{transform:translateX(100%)}
+  100%{transform:translateX(-100%)}
+}
+.tick-item{display:inline-flex;align-items:center;gap:.35rem}
+.tick-dot{width:6px;height:6px;border-radius:50%;background:var(--primary-glow);box-shadow:0 0 6px var(--primary-glow);animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.tick-accent{color:var(--primary-glow);font-weight:700}
+
+/* ── Master Command Header ─────────────────────────────────────────── */
 .master-header{
-  height:56px;display:flex;align-items:center;justify-content:space-between;
-  padding:0 1rem;background:rgba(9,13,22,.96);border-bottom:1px solid rgba(52,211,153,.25);
-  box-shadow:0 4px 24px rgba(0,0,0,.7);position:relative;z-index:100;backdrop-filter:blur(16px);
+  height:60px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.25rem;background:var(--header-bg);
+  border-bottom:1px solid var(--border-glow);
+  box-shadow:0 4px 30px rgba(0,0,0,0.8),0 0 20px var(--primary-glow-box);
+  position:relative;z-index:100;backdrop-filter:blur(20px);
 }
-.brand{display:flex;align-items:center;gap:.6rem;flex-shrink:0}
-.brand-icon{
-  width:34px;height:34px;border-radius:.5rem;background:rgba(16,185,129,.15);border:1.5px solid #34d399;
-  display:flex;align-items:center;justify-content:center;color:#34d399;box-shadow:0 0 12px rgba(52,211,153,.4);
-}
-.brand-title{font-size:1.05rem;font-weight:900;color:#f8fafc;letter-spacing:.02em}
 
-/* ── 40% vs 60% vs 3D Silo Segmented Switcher ─────────────────────── */
+/* Brand Section */
+.brand{display:flex;align-items:center;gap:.75rem;flex-shrink:0}
+.brand-icon{
+  width:38px;height:38px;border-radius:.65rem;
+  background:linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,182,212,0.15));
+  border:1.5px solid var(--primary-glow);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--primary-glow);box-shadow:0 0 16px var(--primary-glow-box);
+  transition:all 0.3s ease;
+}
+.brand-text{display:flex;flex-direction:column}
+.brand-title{
+  font-size:1.15rem;font-weight:900;color:#fff;
+  letter-spacing:.03em;display:flex;align-items:center;gap:.4rem;line-height:1.1;
+}
+.brand-pill{
+  font-size:9px;font-weight:800;padding:2px 6px;border-radius:99px;
+  background:linear-gradient(90deg, #10b981, #06b6d4);color:#03120c;
+  text-transform:uppercase;letter-spacing:.06em;
+}
+.brand-subtitle{
+  font-size:10px;color:#64748b;letter-spacing:.06em;
+  font-family:'JetBrains Mono',monospace;
+}
+
+/* ── Option Navigation Switcher ────────────────────────────────────── */
+.nav-center{
+  display:flex;align-items:center;gap:.6rem;
+}
 .mode-switcher{
-  display:inline-flex;align-items:center;background:rgba(2,6,23,.9);
-  padding:3px;border-radius:.65rem;border:1px solid #334155;gap:3px;
+  display:inline-flex;align-items:center;
+  background:rgba(2,6,18,0.9);padding:4px;border-radius:.75rem;
+  border:1px solid rgba(255,255,255,0.12);gap:4px;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,0.6);
 }
 .mode-tab{
-  display:inline-flex;align-items:center;gap:.45rem;padding:.4rem .85rem;border-radius:.5rem;
-  font-size:.7rem;font-weight:700;color:#94a3b8;transition:all .2s;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:.45rem;padding:.42rem .95rem;
+  border-radius:.55rem;font-size:.75rem;font-weight:700;color:#94a3b8;
+  transition:all .25s ease;white-space:nowrap;user-select:none;
 }
-.mode-tab:hover{color:#f8fafc;background:rgba(51,65,85,.4)}
+.mode-tab:hover{color:#fff;background:rgba(255,255,255,0.06)}
 .mode-tab.active-60{
-  background:#34d399;color:#060a12;font-weight:900;box-shadow:0 0 16px rgba(52,211,153,.6);
+  background:linear-gradient(135deg, #10b981, #34d399);
+  color:#03140e;font-weight:900;
+  box-shadow:0 0 20px rgba(52,211,153,0.7),inset 0 1px 1px rgba(255,255,255,0.6);
 }
 .mode-tab.active-40{
-  background:#06b6d4;color:#021118;font-weight:900;box-shadow:0 0 16px rgba(6,182,212,.7);
+  background:linear-gradient(135deg, #0284c7, #06b6d4);
+  color:#01141d;font-weight:900;
+  box-shadow:0 0 20px rgba(6,182,212,0.8),inset 0 1px 1px rgba(255,255,255,0.6);
 }
 .mode-tab.active-silo{
-  background:#a78bfa;color:#021118;font-weight:900;box-shadow:0 0 16px rgba(167,139,250,.7);
+  background:linear-gradient(135deg, #7c3aed, #a78bfa);
+  color:#110426;font-weight:900;
+  box-shadow:0 0 20px rgba(167,139,250,0.8),inset 0 1px 1px rgba(255,255,255,0.6);
+}
+.mode-tab.active-split{
+  background:linear-gradient(135deg, #f59e0b, #fbbf24);
+  color:#1e1002;font-weight:900;
+  box-shadow:0 0 20px rgba(245,158,11,0.8),inset 0 1px 1px rgba(255,255,255,0.6);
 }
 
-.header-right{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
-.action-link{
-  display:inline-flex;align-items:center;gap:.35rem;padding:.35rem .65rem;border-radius:.45rem;
-  background:rgba(15,23,42,.8);border:1px solid rgba(51,65,85,.6);color:#94a3b8;font-size:.65rem;
-  font-weight:700;text-decoration:none;transition:all .2s;
+/* ── Header Right Tools (Theme, Pitch Tour, Fullscreen) ────────────── */
+.header-right{display:flex;align-items:center;gap:.6rem;flex-shrink:0}
+
+/* Theme Dropdown / Pill */
+.theme-picker{
+  display:flex;align-items:center;background:rgba(15,23,42,0.8);
+  border:1px solid rgba(255,255,255,0.12);padding:3px;border-radius:.6rem;gap:2px;
 }
-.action-link:hover{background:rgba(52,211,153,.15);color:#34d399;border-color:#34d399}
+.theme-btn{
+  width:24px;height:24px;border-radius:.45rem;display:flex;align-items:center;
+  justify-content:center;font-size:11px;transition:all .2s;color:#94a3b8;
+}
+.theme-btn:hover{color:#fff;background:rgba(255,255,255,0.1)}
+.theme-btn.active{background:rgba(255,255,255,0.18);box-shadow:0 0 10px rgba(255,255,255,0.3);color:#fff}
+
+/* Pitch Tour Button */
+.pitch-tour-btn{
+  display:inline-flex;align-items:center;gap:.45rem;
+  padding:.42rem .85rem;border-radius:.6rem;
+  background:linear-gradient(135deg, rgba(239,68,68,0.2), rgba(245,158,11,0.2));
+  border:1.5px solid rgba(245,158,11,0.7);color:#fef08a;font-size:.72rem;font-weight:800;
+  letter-spacing:.04em;text-transform:uppercase;box-shadow:0 0 15px rgba(245,158,11,0.3);
+  transition:all .25s ease;
+}
+.pitch-tour-btn:hover{
+  background:linear-gradient(135deg, #ef4444, #f59e0b);color:#1c0901;
+  box-shadow:0 0 25px rgba(245,158,11,0.8);transform:translateY(-1px);
+}
+.pitch-tour-btn.tour-active{
+  background:linear-gradient(135deg, #ef4444, #dc2626);color:#fff;
+  border-color:#ef4444;box-shadow:0 0 25px rgba(239,68,68,0.9);
+  animation:pitchPulse 1.5s infinite;
+}
+@keyframes pitchPulse{
+  0%,100%{box-shadow:0 0 18px rgba(239,68,68,0.6)}
+  50%{box-shadow:0 0 30px rgba(239,68,68,1)}
+}
+
+/* Control Pills */
+.tool-pill{
+  display:inline-flex;align-items:center;gap:.35rem;padding:.4rem .65rem;border-radius:.55rem;
+  background:rgba(15,23,42,0.8);border:1px solid rgba(255,255,255,0.12);color:#94a3b8;
+  font-size:.7rem;font-weight:700;transition:all .2s;
+}
+.tool-pill:hover{
+  background:rgba(255,255,255,0.1);color:#fff;border-color:var(--primary-glow);
+}
 
 /* ── Seamless Full-Screen Frame Viewports ──────────────────────────── */
 .viewport-container{
-  width:100%;height:calc(100vh - 56px);position:relative;background:#050811;
+  width:100%;height:calc(100vh - 84px);position:relative;background:#050811;
+  overflow:hidden;
 }
 .app-frame{
-  width:100%;height:100%;border:none;display:none;
+  width:100%;height:100%;border:none;display:none;position:absolute;top:0;left:0;
+  transition:opacity .3s ease;
 }
 .app-frame.active{
   display:block;
 }
+
+/* ── Split-Screen Dual Presenter Mode ──────────────────────────────── */
+.split-viewport{
+  display:none;width:100%;height:100%;position:absolute;top:0;left:0;
+  grid-template-columns:1fr 1fr;background:#03060d;gap:4px;
+}
+.split-viewport.active{
+  display:grid;
+}
+.split-frame-wrapper{
+  width:100%;height:100%;position:relative;overflow:hidden;
+  border-right:1px solid var(--border-glow);
+}
+.split-frame-wrapper:last-child{border-right:none}
+.split-frame-header{
+  position:absolute;top:10px;left:10px;z-index:20;
+  background:rgba(3,7,18,0.9);border:1px solid rgba(255,255,255,0.15);
+  backdrop-filter:blur(10px);padding:4px 10px;border-radius:.45rem;
+  font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  display:flex;align-items:center;gap:.4rem;pointer-events:none;
+}
+
+/* ── Floating Presentation Pitch Overlay HUD ───────────────────────── */
+.pitch-hud{
+  display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  max-width:920px;width:calc(100% - 32px);
+  background:rgba(8,14,26,0.96);border:2px solid var(--primary-glow);
+  box-shadow:0 10px 45px rgba(0,0,0,0.9),0 0 35px var(--primary-glow-box);
+  border-radius:1rem;padding:1.1rem 1.5rem;z-index:999;
+  backdrop-filter:blur(24px);animation:slideUp .35s ease-out;
+}
+.pitch-hud.visible{display:block}
+@keyframes slideUp{from{bottom:-60px;opacity:0}to{bottom:24px;opacity:1}}
+.pitch-hud-header{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:.55rem;
+}
+.pitch-tag{
+  font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;
+  padding:3px 8px;border-radius:.35rem;background:var(--primary-glow);color:#03140e;
+}
+.pitch-counter{font-size:11px;font-weight:800;color:var(--text-sub);font-family:'JetBrains Mono',monospace}
+.pitch-headline{font-size:1.15rem;font-weight:900;color:#fff;margin-bottom:.35rem;line-height:1.2}
+.pitch-narrative{font-size:.85rem;color:#cbd5e1;line-height:1.45;margin-bottom:.85rem}
+.pitch-actions{display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.pitch-nav-group{display:flex;gap:.5rem}
+.pitch-btn{
+  padding:.45rem 1rem;border-radius:.5rem;font-size:.75rem;font-weight:800;
+  display:inline-flex;align-items:center;gap:.4rem;transition:all .2s;
+}
+.pitch-btn-prev{background:rgba(255,255,255,0.08);color:#94a3b8}
+.pitch-btn-prev:hover{background:rgba(255,255,255,0.15);color:#fff}
+.pitch-btn-next{background:var(--primary-glow);color:#02140e;box-shadow:0 0 15px var(--primary-glow-box)}
+.pitch-btn-next:hover{transform:scale(1.03)}
+.pitch-btn-close{background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.4)}
+.pitch-btn-close:hover{background:rgba(239,68,68,0.3);color:#fff}
+
+/* Responsive adjustments */
+@media(max-width:1100px){
+  .mode-tab span:last-child{display:none}
+  .mode-tab{padding:.42rem .65rem}
+  .brand-subtitle{display:none}
+}
+@media(max-width:768px){
+  .presentation-ticker{display:none}
+  .viewport-container{height:calc(100vh - 60px)}
+  .split-viewport{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
+  .pitch-hud{padding:1rem;bottom:12px}
+  .pitch-headline{font-size:1rem}
+}
 </style>
 </head>
-<body>
+<body class="theme-emerald">
 
-<!-- ── MASTER HEADER WITH OPTION SWITCHER ── -->
+<!-- ── LIVE TELEMETRY PRESENTATION TICKER ── -->
+<div class="presentation-ticker">
+  <div class="ticker-content" id="tickerStream">
+    <div class="tick-item"><span class="tick-dot"></span><span>GRAIN SILO #4 ACTIVE</span></div>
+    <div class="tick-item"><span class="tick-accent">PRESERVATION TARGET: 60%</span></div>
+    <div class="tick-item"><span>BIOFUEL DIVERSION: 40% RECOVERY STREAM</span></div>
+    <div class="tick-item"><span class="tick-accent">METHANE PURITY: 74.2% CH₄</span></div>
+    <div class="tick-item"><span>CLEAN POWER GENERATION: 418 kW</span></div>
+    <div class="tick-item"><span class="tick-accent">VOXELS ONLINE: 75 / 75 MULTI-DEPTH</span></div>
+    <div class="tick-item"><span>AI INTERCEPT: DYNAMIC SPOILAGE ATTENUATION ENGAGED</span></div>
+    <div class="tick-item"><span class="tick-accent">VOICE RADAR: EN / TA / HI READY</span></div>
+  </div>
+</div>
+
+<!-- ── MASTER COMMAND HEADER ── -->
 <header class="master-header">
   <div class="brand">
     <div class="brand-icon">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
     </div>
-    <span class="brand-title">SiloGuard Master</span>
+    <div class="brand-text">
+      <div class="brand-title">
+        <span>SiloGuard AI</span>
+        <span class="brand-pill">Unified Suite</span>
+      </div>
+      <span class="brand-subtitle">Digital Twin · Circular Bio-Energy</span>
+    </div>
   </div>
 
-  <!-- 🎯 THE 3 MASTER OPTIONS (60% vs 40% vs 3D Virtual Silo) -->
-  <div class="mode-switcher">
-    <button class="mode-tab active-60" id="tab-60" onclick="switchApp('frame-60', 'active-60', this)">
-      <span>🌾</span>
-      <span>60% Grain Silo Twin</span>
-    </button>
-    <button class="mode-tab" id="tab-40" onclick="switchApp('frame-40', 'active-40', this)">
-      <span>⚡</span>
-      <span>40% Biofuel Facility</span>
-    </button>
-    <button class="mode-tab" id="tab-silo" onclick="switchApp('frame-silo', 'active-silo', this)">
-      <span>🏛️</span>
-      <span>3D Virtual Silo Table</span>
-    </button>
+  <!-- 🎯 SEGMENTED SWITCHER (60% Grain, 40% Biofuel, 3D Silo, Split View) -->
+  <div class="nav-center">
+    <div class="mode-switcher">
+      <button class="mode-tab active-60" id="tab-60" onclick="switchApp('frame-60', 'active-60', this)" title="60% Food Grain Silo Preservation">
+        <span>🌾</span>
+        <span>60% Grain Silo</span>
+      </button>
+      <button class="mode-tab" id="tab-40" onclick="switchApp('frame-40', 'active-40', this)" title="40% Anaerobic Biofuel Power Plant">
+        <span>⚡</span>
+        <span>40% Biofuel</span>
+      </button>
+      <button class="mode-tab" id="tab-silo" onclick="switchApp('frame-silo', 'active-silo', this)" title="75-Voxel 3D Virtual Silo Table">
+        <span>🏛️</span>
+        <span>3D Silo Grid</span>
+      </button>
+      <button class="mode-tab" id="tab-split" onclick="switchApp('split-view', 'active-split', this)" title="Side-by-Side Dual Presenter View">
+        <span>⚡🌾</span>
+        <span>Dual Split 60/40</span>
+      </button>
+    </div>
   </div>
 
-  <!-- Actions -->
+  <!-- ── Tools: Presentation Tour, Themes, Fullscreen ── -->
   <div class="header-right">
-    <button class="action-link" onclick="reloadActiveFrame()" title="Reload Active App">
-      <span>🔄</span>
-      <span>Reload</span>
+    <!-- Pitch Tour Button -->
+    <button class="pitch-tour-btn" id="pitchTourBtn" onclick="togglePitchTour()" title="Start Guided Pitch Presentation Tour for Judges">
+      <span>▶</span>
+      <span>Demo Tour</span>
     </button>
-    <a id="popoutLink" href="SiloGuard.html" target="_blank" class="action-link" title="Open active module in new tab">
+
+    <!-- Theme Switcher -->
+    <div class="theme-picker" title="Switch Presentation Visual Atmosphere">
+      <button class="theme-btn active" id="th-emerald" onclick="setMasterTheme('theme-emerald', this)" title="Emerald Quantum Theme">🌿</button>
+      <button class="theme-btn" id="th-cyan" onclick="setMasterTheme('theme-cyan', this)" title="Cyber Cyan Theme">⚡</button>
+      <button class="theme-btn" id="th-gold" onclick="setMasterTheme('theme-gold', this)" title="Obsidian Gold Theme">👑</button>
+    </div>
+
+    <!-- Fullscreen Toggle -->
+    <button class="tool-pill" onclick="toggleFullscreen()" title="Toggle Fullscreen Presentation">
+      <span>⛶</span>
+      <span>Expand</span>
+    </button>
+
+    <!-- Popout / Direct Link -->
+    <a id="popoutLink" href="SiloGuard.html" target="_blank" class="tool-pill" title="Open Module in New Dedicated Window">
       <span>↗️</span>
-      <span>Full View</span>
+      <span>Direct</span>
     </a>
   </div>
 </header>
 
-<!-- ── 3 DEDICATED SEAMLESS VIEWPORTS ── -->
+<!-- ── SEAMLESS HIGH-PERFORMANCE VIEWPORTS ── -->
 <div class="viewport-container">
   <!-- 🌾 60% Core Grain Silo Digital Twin -->
   <iframe id="frame-60" class="app-frame active" src="SiloGuard.html" title="60% Grain Silo Digital Twin"></iframe>
@@ -113,41 +383,209 @@ button{cursor:pointer;font-family:inherit;border:none}
 
   <!-- 🏛️ 3D Virtual Silo Split-Screen Telemetry Table -->
   <iframe id="frame-silo" class="app-frame" src="virtual_silo.html" title="3D Virtual Silo Table"></iframe>
+
+  <!-- ⚡🌾 Split-Screen Dual Presenter View (60% Grain + 40% Biofuel side-by-side) -->
+  <div id="split-view" class="split-viewport">
+    <div class="split-frame-wrapper">
+      <div class="split-frame-header" style="color:#34d399;border-color:rgba(52,211,153,0.4)">
+        <span>🌾</span> 60% Grain Silo Digital Twin
+      </div>
+      <iframe src="SiloGuard.html" style="width:100%;height:100%;border:none;" title="60% Grain Silo"></iframe>
+    </div>
+    <div class="split-frame-wrapper">
+      <div class="split-frame-header" style="color:#06b6d4;border-color:rgba(6,182,212,0.4)">
+        <span>⚡</span> 40% Biofuel Power Recovery
+      </div>
+      <iframe src="biofuel_recovery.html" style="width:100%;height:100%;border:none;" title="40% Biofuel Recovery"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- ── FLOATING PRESENTATION PITCH OVERLAY HUD ── -->
+<div class="pitch-hud" id="pitchHud">
+  <div class="pitch-hud-header">
+    <span class="pitch-tag" id="pitchStepTag">STEP 1 OF 4</span>
+    <span class="pitch-counter" id="pitchStepCounter">PRESENTATION GUIDE</span>
+  </div>
+  <h2 class="pitch-headline" id="pitchStepHeadline">The Crisis: Micro-Climate Hotspots & Post-Harvest Spoilage</h2>
+  <p class="pitch-narrative" id="pitchStepNarrative">
+    Grain silos lose millions of tons annually to unseen fungal growth. SiloGuard deploys 75 multi-depth sensors mapped directly to a 3D digital twin, detecting spoilage 72 hours before visible grain crusting occurs.
+  </p>
+  <div class="pitch-actions">
+    <button class="pitch-btn pitch-btn-close" onclick="closePitchTour()">✕ Close Guide</button>
+    <div class="pitch-nav-group">
+      <button class="pitch-btn pitch-btn-prev" onclick="prevPitchStep()">◀ Previous</button>
+      <button class="pitch-btn pitch-btn-next" onclick="nextPitchStep()">Next Slide ▶</button>
+    </div>
+  </div>
 </div>
 
 <script>
 'use strict';
+
 var currentFrameId = 'frame-60';
 
 var URL_MAP = {
   'frame-60': 'SiloGuard.html',
   'frame-40': 'biofuel_recovery.html',
-  'frame-silo': 'virtual_silo.html'
+  'frame-silo': 'virtual_silo.html',
+  'split-view': 'SiloGuard.html'
 };
+
+// Pitch Presentation Steps
+var pitchSteps = [
+  {
+    frameId: 'frame-60',
+    tabClass: 'active-60',
+    tag: 'STEP 1 OF 4 · 60% GRAIN PRESERVATION',
+    headline: '75-Voxel Multi-Depth Telemetry & Predictive AI Twin',
+    narrative: 'Observe the 3D Telemetry Grid on Silo #4. Our fungal kinetics equation (Af) calculates safe shelf-life in real time. Notice the interactive zoom controls ([-], [+], [Fit]) allowing granular voxel inspection without stretching or distorting the layout.'
+  },
+  {
+    frameId: 'frame-60',
+    tabClass: 'active-60',
+    tag: 'STEP 2 OF 4 · CRISIS RESCUE & AUCTION',
+    headline: '2-Minute Emergency Countdown & Multilingual Voice Defense',
+    narrative: 'When moisture or thermal runaway breaches threshold limits, SiloGuard activates acoustic alarms, initiates localized aeration fans, and launches a dynamic flash-auction. Multilingual voice synthesis broadcasts life-saving alerts in English, Tamil, and Hindi.'
+  },
+  {
+    frameId: 'frame-40',
+    tabClass: 'active-40',
+    tag: 'STEP 3 OF 4 · 40% BIOFUEL VALORIZATION',
+    headline: 'Zero-Waste Circular Bio-Energy Recovery',
+    narrative: 'Instead of discarding spoiled grain into toxic landfills, 40% is instantly diverted into our anaerobic digestor. Real-time methanogenesis converts the damaged grain into 74.2% pure biomethane, generating 418 kW of clean electricity and bio-fertilizer.'
+  },
+  {
+    frameId: 'split-view',
+    tabClass: 'active-split',
+    tag: 'STEP 4 OF 4 · UNIFIED DUAL ARCHITECTURE',
+    headline: 'Closed-Loop Circular Economy in Real-Time Sync',
+    narrative: 'Both systems work in synchronized harmony: 60% premium grain safeguarded for human nutrition, and 40% compromised salvage turned into renewable green energy. A complete, software-defined end-to-end Agritech revolution.'
+  }
+];
+
+var pitchStepIndex = 0;
+var isTourActive = false;
 
 function switchApp(frameId, activeClass, btn) {
   currentFrameId = frameId;
 
-  // Hide all frames, show selected
+  // Hide single frames and split view
   document.querySelectorAll('.app-frame').forEach(function(f){ f.classList.remove('active'); });
-  var frame = document.getElementById(frameId);
-  if (frame) frame.classList.add('active');
+  var splitView = document.getElementById('split-view');
+  if (splitView) splitView.classList.remove('active');
+
+  // Activate selected view
+  if (frameId === 'split-view') {
+    if (splitView) splitView.classList.add('active');
+  } else {
+    var frame = document.getElementById(frameId);
+    if (frame) frame.classList.add('active');
+  }
 
   // Update tabs
   document.querySelectorAll('.mode-tab').forEach(function(b){
-    b.classList.remove('active-60', 'active-40', 'active-silo');
+    b.classList.remove('active-60', 'active-40', 'active-silo', 'active-split');
   });
-  if (btn) btn.classList.add(activeClass);
+  if (btn) {
+    btn.classList.add(activeClass);
+  } else {
+    var mappedBtn = document.querySelector('.mode-tab[onclick*="' + frameId + '"]');
+    if (mappedBtn) mappedBtn.classList.add(activeClass);
+  }
 
   // Update popout link
   var popout = document.getElementById('popoutLink');
   if (popout && URL_MAP[frameId]) popout.href = URL_MAP[frameId];
 }
 
-function reloadActiveFrame() {
-  var frame = document.getElementById(currentFrameId);
-  if (frame) frame.src = frame.src;
+/* ── Presentation Theme Switching ── */
+function setMasterTheme(themeClass, btn) {
+  document.body.className = themeClass;
+  document.querySelectorAll('.theme-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
 }
+
+/* ── Fullscreen Toggle ── */
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(function(err){
+      console.warn('Fullscreen error:', err);
+    });
+  } else {
+    if (document.exitFullscreen) document.exitFullscreen();
+  }
+}
+
+/* ── Presentation Pitch Tour ── */
+function togglePitchTour() {
+  if (isTourActive) {
+    closePitchTour();
+  } else {
+    startPitchTour();
+  }
+}
+
+function startPitchTour() {
+  isTourActive = true;
+  pitchStepIndex = 0;
+  var tourBtn = document.getElementById('pitchTourBtn');
+  if (tourBtn) {
+    tourBtn.classList.add('tour-active');
+    tourBtn.innerHTML = '<span>■</span><span>Stop Tour</span>';
+  }
+  document.getElementById('pitchHud').classList.add('visible');
+  renderPitchStep();
+}
+
+function closePitchTour() {
+  isTourActive = false;
+  var tourBtn = document.getElementById('pitchTourBtn');
+  if (tourBtn) {
+    tourBtn.classList.remove('tour-active');
+    tourBtn.innerHTML = '<span>▶</span><span>Demo Tour</span>';
+  }
+  document.getElementById('pitchHud').classList.remove('visible');
+}
+
+function renderPitchStep() {
+  var step = pitchSteps[pitchStepIndex];
+  if (!step) return;
+
+  switchApp(step.frameId, step.tabClass);
+
+  document.getElementById('pitchStepTag').textContent = step.tag;
+  document.getElementById('pitchStepCounter').textContent = 'SLIDE ' + (pitchStepIndex + 1) + ' OF ' + pitchSteps.length;
+  document.getElementById('pitchStepHeadline').textContent = step.headline;
+  document.getElementById('pitchStepNarrative').textContent = step.narrative;
+}
+
+function nextPitchStep() {
+  if (pitchStepIndex < pitchSteps.length - 1) {
+    pitchStepIndex++;
+    renderPitchStep();
+  } else {
+    closePitchTour();
+  }
+}
+
+function prevPitchStep() {
+  if (pitchStepIndex > 0) {
+    pitchStepIndex--;
+    renderPitchStep();
+  }
+}
+
+// Keyboard shortcuts for seamless pitch presentations
+window.addEventListener('keydown', function(e) {
+  if (e.key === '1') switchApp('frame-60', 'active-60');
+  if (e.key === '2') switchApp('frame-40', 'active-40');
+  if (e.key === '3') switchApp('frame-silo', 'active-silo');
+  if (e.key === '4') switchApp('split-view', 'active-split');
+  if (e.key === 'ArrowRight' && isTourActive) nextPitchStep();
+  if (e.key === 'ArrowLeft' && isTourActive) prevPitchStep();
+  if (e.key === 'Escape' && isTourActive) closePitchTour();
+});
 </script>
 </body>
 </html>
