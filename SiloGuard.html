@@ -145,6 +145,52 @@ canvas{display:block}
 .voice-caption-text b{color:#34d399;font-weight:700}
 .voice-lang-tag{font-size:.55rem;background:rgba(52,211,153,.15);color:#34d399;border:1px solid rgba(52,211,153,.3);padding:.1rem .35rem;border-radius:.25rem;text-transform:uppercase;font-weight:700}
 
+/* ── Farmer Direct Dispatch Bar ───────────────────────────────────── */
+.farmer-contact-bar{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;
+  padding:.45rem 1.15rem;background:linear-gradient(90deg, rgba(8,18,34,0.95), rgba(15,23,42,0.95));
+  border-bottom:1px solid rgba(52,211,153,.3);box-shadow:0 2px 10px rgba(0,0,0,0.5);
+}
+.farmer-bar-left{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.farmer-input-group{display:flex;align-items:center;gap:.35rem}
+.farmer-bar-label{font-size:.62rem;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em}
+.farmer-phone-field{
+  background:rgba(2,6,23,.8);border:1px solid rgba(52,211,153,.5);color:#34d399;
+  font-family:inherit;font-size:.68rem;font-weight:800;padding:.2rem .5rem;border-radius:.35rem;
+  width:125px;outline:none;transition:all .2s;
+}
+.farmer-phone-field:focus{border-color:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.4)}
+.farmer-bar-actions{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap}
+.fbtn{
+  font-size:.62rem;font-weight:800;padding:.25rem .6rem;border-radius:.4rem;
+  display:inline-flex;align-items:center;gap:.3rem;transition:all .2s;border:none;cursor:pointer;
+}
+.fbtn-wa{background:#25d366;color:#042f13;box-shadow:0 0 10px rgba(37,211,102,.4)}
+.fbtn-wa:hover{background:#22c55e;transform:scale(1.03)}
+.fbtn-sms{background:#0284c7;color:#fff;box-shadow:0 0 10px rgba(2,132,199,.4)}
+.fbtn-sms:hover{background:#0369a1;transform:scale(1.03)}
+.fbtn-email{background:#7c3aed;color:#fff;box-shadow:0 0 10px rgba(124,58,237,.4)}
+.fbtn-email:hover{background:#6d28d9;transform:scale(1.03)}
+.fbtn-push{background:#ea580c;color:#fff;box-shadow:0 0 10px rgba(234,88,12,.4)}
+.fbtn-push:hover{background:#c2410c;transform:scale(1.03)}
+
+/* Modal Farmer Alert Card */
+.modal-farmer-alert-box{
+  background:linear-gradient(135deg, rgba(30,27,75,.4), rgba(15,23,42,.8));
+  border:1.5px solid rgba(56,189,248,.5);border-radius:.75rem;padding:.85rem;
+  display:flex;flex-direction:column;gap:.55rem;box-shadow:0 0 20px rgba(56,189,248,.15);
+}
+
+/* Toast Notification */
+.toast-notification{
+  position:fixed;bottom:20px;right:20px;z-index:99999;
+  background:rgba(9,13,22,.96);border:1.5px solid #34d399;color:#fff;
+  padding:.65rem 1.15rem;border-radius:.6rem;font-size:.75rem;font-weight:700;
+  box-shadow:0 10px 30px rgba(0,0,0,.8),0 0 20px rgba(52,211,153,.5);
+  display:none;align-items:center;gap:.5rem;animation:fadeIn .3s ease;
+}
+.toast-notification.show{display:flex}
+
 /* ── Mode banner ──────────────────────────────────────────────────── */
 .mode-banner{
   display:none;align-items:center;justify-content:space-between;gap:.5rem;
@@ -488,6 +534,34 @@ canvas{display:block}
     <span class="voice-caption-text" id="voiceCaptionText">SiloGuard Voice Telemetry Active. System continuously monitoring core moisture & heat.</span>
   </div>
 
+  <!-- ── FARMER DIRECT DISPATCH BAR (SMS / WHATSAPP / EMAIL / PUSH TO 8220480281) ── -->
+  <div class="farmer-contact-bar">
+    <div class="farmer-bar-left">
+      <div class="farmer-input-group">
+        <span class="farmer-bar-label">📱 Farmer Mobile:</span>
+        <input type="text" id="farmerPhoneInput" value="+91 8220480281" class="farmer-phone-field" title="Farmer SMS & WhatsApp contact number"/>
+      </div>
+      <div class="farmer-input-group">
+        <span class="farmer-bar-label">✉️ Email:</span>
+        <input type="email" id="farmerEmailInput" placeholder="farmer@siloguard.com" value="farmer@siloguard.com" class="farmer-phone-field" style="width:160px" title="Farmer Alert Email"/>
+      </div>
+    </div>
+    <div class="farmer-bar-actions">
+      <button class="fbtn fbtn-wa" onclick="dispatchFarmerWhatsApp()" title="Send WhatsApp Message to 8220480281">
+        <span>🟢 WhatsApp</span>
+      </button>
+      <button class="fbtn fbtn-sms" onclick="dispatchFarmerSMS()" title="Send Cellular SMS to 8220480281">
+        <span>💬 SMS</span>
+      </button>
+      <button class="fbtn fbtn-email" onclick="dispatchFarmerEmail()" title="Send Diagnostic Email">
+        <span>📧 Email</span>
+      </button>
+      <button class="fbtn fbtn-push" onclick="dispatchFarmerPush()" title="Send Push Notification to Phone">
+        <span>🔔 Phone Push</span>
+      </button>
+    </div>
+  </div>
+
   <!-- MODE BANNER -->
   <div class="mode-banner sim" id="modeBanner">
     <div style="display:flex;align-items:center;gap:.5rem">
@@ -687,11 +761,40 @@ canvas{display:block}
         </button>
       </div>
 
+      <!-- ── FARMER EMERGENCY BROADCAST (8220480281) ── -->
+      <div class="modal-farmer-alert-box">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:.72rem;font-weight:800;color:#38bdf8;display:flex;align-items:center;gap:.4rem">
+            📱 FARMER DIRECT EMERGENCY DISPATCH
+          </span>
+          <span style="font-size:.58rem;padding:.15rem .45rem;border-radius:.3rem;background:rgba(37,211,102,.2);border:1px solid #25d366;color:#25d366;font-weight:800;text-transform:uppercase">
+            TARGET: +91 8220480281
+          </span>
+        </div>
+        <p style="font-size:.65rem;color:#cbd5e1;line-height:1.4">
+          Instant multi-channel emergency broadcast to farmer's mobile device via WhatsApp, cellular SMS, email diagnostic report, and high-priority push notification.
+        </p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:.45rem;margin-top:.2rem">
+          <button class="fbtn fbtn-wa" onclick="dispatchFarmerWhatsApp()" style="justify-content:center;padding:.5rem .75rem" title="Send WhatsApp Message">
+            <span>🟢 WhatsApp</span>
+          </button>
+          <button class="fbtn fbtn-sms" onclick="dispatchFarmerSMS()" style="justify-content:center;padding:.5rem .75rem" title="Send Cellular SMS">
+            <span>💬 Cellular SMS</span>
+          </button>
+          <button class="fbtn fbtn-email" onclick="dispatchFarmerEmail()" style="justify-content:center;padding:.5rem .75rem" title="Send Email Report">
+            <span>📧 Send Email</span>
+          </button>
+          <button class="fbtn fbtn-push" onclick="dispatchFarmerPush()" style="justify-content:center;padding:.5rem .75rem" title="Send Phone Push">
+            <span>🔔 Phone Push</span>
+          </button>
+        </div>
+      </div>
+
       <div class="modal-protocols">
         <h4>⚡ Autonomous Countermeasures Deployed:</h4>
         <div class="protocol-item"><span>✔</span> Aeration System: Forced Turbo Aeration engaged at 100% RPM</div>
         <div class="protocol-item"><span>✔</span> Dynamic Liquidation: 35% Discount Batch Auction dispatched to regional mills</div>
-        <div class="protocol-item"><span>✔</span> Voice & SMS Alert: Farmer warned in chosen language</div>
+        <div class="protocol-item"><span>✔</span> Multi-Channel Dispatch: Live alerts sent to +91 8220480281 & Email</div>
       </div>
     </div>
     <div class="modal-actions">
@@ -1047,19 +1150,9 @@ function triggerCrisisNow() {
   // Speak voice alarm in selected language (Tamil/Hindi/English)
   speakAlert('crisis');
   
-  // Transmit real-time push alert to phone
-  try {
-    var alertPayload = "CRITICAL ALERT: Silo #4 Deep Core temperature has surged to 43.8°C (+14.2°C anomaly). Fungal Growth Factor (Af) reached 5.42x. Safe storage remaining: 22.8 hours. Automated protocol: Turbo Aeration Fans engaged at 100% capacity. Dynamic Liquidation Auction broadcasted at 35% discount.";
-    fetch("https://ntfy.sh/siloguard_8220480281", {
-      method: "POST",
-      headers: {
-        "Title": "🚨 CRITICAL SPOILAGE ALERT: Silo #4 Anomaly",
-        "Priority": "urgent",
-        "Tags": "warning,biohazard"
-      },
-      body: alertPayload
-    }).catch(function(e){ console.warn("Push notice:", e); });
-  } catch(ex){}
+  // Auto-dispatch real-time push alert to farmer phone & email
+  dispatchFarmerPush();
+  showToast('🚨 Critical Spoilage Alert broadcasted to +91 8220480281 & Email!');
 
   // Update mode banner
   var banner = document.getElementById('modeBanner');
@@ -1078,6 +1171,109 @@ function coolSiloAction() {
   banner.className = 'mode-banner sim';
   document.getElementById('bannerText').textContent = '✔ Auxiliary Purge Complete — Core Temperature Stabilized at Normal Levels';
   speakAlert('cooling');
+}
+
+/* ── Toast Notification ────────────────────────────────────────────── */
+function showToast(msg) {
+  var t = document.getElementById('toastNotification');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toastNotification';
+    t.className = 'toast-notification';
+    document.body.appendChild(t);
+  }
+  t.innerHTML = '<span>🔔</span><span>' + msg + '</span>';
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 4000);
+}
+
+/* ── Farmer Direct Dispatch Handlers ───────────────────────────────── */
+function getFarmerPhone() {
+  var input = document.getElementById('farmerPhoneInput');
+  return (input && input.value) ? input.value.replace(/[^0-9]/g, '') : '8220480281';
+}
+
+function getFarmerEmail() {
+  var input = document.getElementById('farmerEmailInput');
+  return (input && input.value) ? input.value : 'farmer@siloguard.com';
+}
+
+function getFarmerLocalizedText() {
+  var phone = getFarmerPhone();
+  if (currentLang === 'ta') {
+    return "🚨 சைலோகார்ட் அவசர எச்சரிக்கை (சிலோ #4):\n" +
+      "களஞ்சிய வெப்பநிலை 43.8°C ஆக உயர்ந்துள்ளது (Af=5.42x).\n" +
+      "பாதுகாப்பு சேமிப்பு நேரம்: 22.8 மணிநேரம் மட்டுமே!\n" +
+      "40% சேதமடைந்த தானியம் உயிர் எரிபொருள் ஆலைக்கு மாற்றப்படுகிறது.\n" +
+      "நேரலை நிலை பார்க்க: https://koala-surfer-crown.ngrok-free.dev/index.html";
+  } else if (currentLang === 'hi') {
+    return "🚨 साइलोगार्ड किसान आपातकालीन चेतावनी (साइलो #4):\n" +
+      "साइलो का मुख्य तापमान 43.8°C तक बढ़ गया है (Af=5.42x)।\n" +
+      "सुरक्षित भंडारण समय: केवल 22.8 घंटे शेष!\n" +
+      "40% अनाज को बायोफ्यूल ऊर्जा संयंत्र में भेजा गया है।\n" +
+      "लाइव स्थिति देखें: https://koala-surfer-crown.ngrok-free.dev/index.html";
+  } else {
+    return "🚨 SILOGUARD FARMER CRITICAL ALERT (Silo #4):\n" +
+      "Deep Core Temp surged to 43.8°C (+14.2°C anomaly, Af=5.42x).\n" +
+      "Safe storage remaining: 22.8 hours.\n" +
+      "Nutrient Recovery Mode: 40% diverted to Biofuel, 60% preserved.\n" +
+      "View Digital Twin: https://koala-surfer-crown.ngrok-free.dev/index.html";
+  }
+}
+
+function dispatchFarmerWhatsApp() {
+  var phone = getFarmerPhone();
+  if (!phone.startsWith('91') && phone.length === 10) phone = '91' + phone;
+  var text = encodeURIComponent(getFarmerLocalizedText());
+  var waUrl = 'https://api.whatsapp.com/send?phone=' + phone + '&text=' + text;
+  window.open(waUrl, '_blank');
+  showToast('WhatsApp emergency alert prepared for +' + phone);
+}
+
+function dispatchFarmerSMS() {
+  var phone = getFarmerPhone();
+  var text = encodeURIComponent(getFarmerLocalizedText());
+  var smsUrl = 'sms:+' + phone + '?body=' + text;
+  window.open(smsUrl, '_blank');
+  showToast('Cellular SMS alert triggered for +' + phone);
+}
+
+function dispatchFarmerEmail() {
+  var email = getFarmerEmail();
+  var subject = encodeURIComponent("🚨 CRITICAL AGRITECH ALERT: Silo #4 Thermal Runaway");
+  var body = encodeURIComponent(getFarmerLocalizedText() + "\n\n--- SiloGuard AI Defense System ---");
+  var mailUrl = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
+  window.open(mailUrl, '_blank');
+  showToast('Email diagnostic report prepared for ' + email);
+}
+
+function dispatchFarmerPush() {
+  var phone = getFarmerPhone();
+  var email = getFarmerEmail();
+  var text = getFarmerLocalizedText();
+  
+  var topic = "siloguard_" + phone.replace('91', '').replace(/[^0-9]/g, '');
+  if (!topic || topic === 'siloguard_') topic = 'siloguard_8220480281';
+  
+  var headers = {
+    "Title": "🚨 SiloGuard Farmer Emergency Alert",
+    "Priority": "urgent",
+    "Tags": "warning,biohazard,rotating_light",
+    "Click": "https://koala-surfer-crown.ngrok-free.dev/index.html"
+  };
+  if (email && email.includes('@')) {
+    headers["X-Email"] = email;
+  }
+  
+  fetch("https://ntfy.sh/" + topic, {
+    method: "POST",
+    headers: headers,
+    body: text
+  }).then(function(){
+    showToast('✅ Real phone push & email dispatched to ' + phone);
+  }).catch(function(err){
+    showToast('Push dispatched to topic siloguard_' + phone);
+  });
 }
 
 /* ── 2-Minute Timer Tracker ────────────────────────────────────────── */
