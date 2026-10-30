@@ -190,8 +190,11 @@ button,a{cursor:pointer;font-family:inherit;border:none;text-decoration:none}
     <a href="biofuel_recovery.html" class="btn-pill" title="40% Biofuel">
       <span>⚡ Biofuel</span>
     </a>
-    <button class="btn-pill primary" id="btnDownloadVideo" onclick="exportRecordedVideo()" title="Export & download full video as MP4/WebM">
-      <span>🎥 Download Video</span>
+    <a href="SiloGuard_AI_Presentation.mp4" download="SiloGuard_AI_Presentation.mp4" class="btn-pill primary" title="Download Rendered MP4 Video File (H.264 + AAC Audio)">
+      <span>⬇️ Direct MP4 File</span>
+    </a>
+    <button class="btn-pill" id="btnDownloadVideo" onclick="exportRecordedVideo()" title="Live Canvas Screen Recorder">
+      <span>⏺ Record Stream</span>
     </button>
   </div>
 </header>
@@ -289,9 +292,9 @@ button,a{cursor:pointer;font-family:inherit;border:none;text-decoration:none}
     </div>
     <div style="display:flex;align-items:center;gap:.65rem">
       <div class="rec-status" id="recStatus"><span class="rec-dot"></span><span>RECORDING CANVAS...</span></div>
-      <button class="btn-pill primary" onclick="exportRecordedVideo()">
-        <span>⏺ Export Video File (MP4/WebM)</span>
-      </button>
+      <a href="SiloGuard_AI_Presentation.mp4" download="SiloGuard_AI_Presentation.mp4" class="btn-pill primary" style="padding:.55rem 1.15rem;font-size:.8rem">
+        <span>⬇️ Download MP4 Video (2.7 MB)</span>
+      </a>
     </div>
   </div>
 
