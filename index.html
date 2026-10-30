@@ -159,6 +159,11 @@ button, a{cursor:pointer;font-family:inherit;border:none;text-decoration:none}
   color:#1e1002;font-weight:900;
   box-shadow:0 0 20px rgba(245,158,11,0.8),inset 0 1px 1px rgba(255,255,255,0.6);
 }
+.mode-tab.active-video{
+  background:linear-gradient(135deg, #ef4444, #f59e0b);
+  color:#1c0901;font-weight:900;
+  box-shadow:0 0 20px rgba(239,68,68,0.8),inset 0 1px 1px rgba(255,255,255,0.6);
+}
 
 /* ── Header Right Tools (Theme, Pitch Tour, Fullscreen) ────────────── */
 .header-right{display:flex;align-items:center;gap:.6rem;flex-shrink:0}
@@ -341,6 +346,10 @@ button, a{cursor:pointer;font-family:inherit;border:none;text-decoration:none}
         <span>⚡🌾</span>
         <span>Dual Split 60/40</span>
       </button>
+      <button class="mode-tab" id="tab-video" onclick="switchApp('frame-video', 'active-video', this)" title="Watch 2.5-Minute AI Explainer Video with Subtitles">
+        <span>🎬</span>
+        <span>AI Explainer Video</span>
+      </button>
     </div>
   </div>
 
@@ -390,6 +399,9 @@ button, a{cursor:pointer;font-family:inherit;border:none;text-decoration:none}
   <!-- 🏛️ 3D Virtual Silo Split-Screen Telemetry Table -->
   <iframe id="frame-silo" class="app-frame" src="virtual_silo.html" title="3D Virtual Silo Table"></iframe>
 
+  <!-- 🎬 2.5-Minute AI Explainer Video Studio -->
+  <iframe id="frame-video" class="app-frame" src="video.html" title="SiloGuard AI Explainer Video"></iframe>
+
   <!-- ⚡🌾 Split-Screen Dual Presenter View (60% Grain + 40% Biofuel side-by-side) -->
   <div id="split-view" class="split-viewport">
     <div class="split-frame-wrapper">
@@ -435,6 +447,7 @@ var URL_MAP = {
   'frame-60': 'SiloGuard.html',
   'frame-40': 'biofuel_recovery.html',
   'frame-silo': 'virtual_silo.html',
+  'frame-video': 'video.html',
   'split-view': 'SiloGuard.html'
 };
 
@@ -491,7 +504,7 @@ function switchApp(frameId, activeClass, btn) {
 
   // Update tabs
   document.querySelectorAll('.mode-tab').forEach(function(b){
-    b.classList.remove('active-60', 'active-40', 'active-silo', 'active-split');
+    b.classList.remove('active-60', 'active-40', 'active-silo', 'active-split', 'active-video');
   });
   if (btn) {
     btn.classList.add(activeClass);
@@ -588,6 +601,7 @@ window.addEventListener('keydown', function(e) {
   if (e.key === '2') switchApp('frame-40', 'active-40');
   if (e.key === '3') switchApp('frame-silo', 'active-silo');
   if (e.key === '4') switchApp('split-view', 'active-split');
+  if (e.key === '5') switchApp('frame-video', 'active-video');
   if (e.key === 'ArrowRight' && isTourActive) nextPitchStep();
   if (e.key === 'ArrowLeft' && isTourActive) prevPitchStep();
   if (e.key === 'Escape' && isTourActive) closePitchTour();

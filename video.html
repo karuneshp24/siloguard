@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
+<title>SiloGuard — Official AI Cinematic Explainer Video (2.5 Min)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg-deep:#030712;
+  --primary-glow:#34d399;
+  --cyan-glow:#06b6d4;
+  --amber-glow:#f59e0b;
+  --danger-glow:#ef4444;
+  --text-main:#f8fafc;
+  --text-sub:#94a3b8;
+}
+html,body{
+  width:100%;height:100%;overflow-x:hidden;
+  background:var(--bg-deep);color:var(--text-main);
+  font-family:'Outfit','JetBrains Mono',sans-serif;
+}
+button,a{cursor:pointer;font-family:inherit;border:none;text-decoration:none}
+
+/* ── Top Bar ───────────────────────────────────────────────────────── */
+.topbar{
+  height:54px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.25rem;background:rgba(9,13,22,0.95);border-bottom:1px solid rgba(52,211,153,0.3);
+  backdrop-filter:blur(16px);position:sticky;top:0;z-index:50;
+}
+.brand{display:flex;align-items:center;gap:.65rem}
+.brand-icon{
+  width:32px;height:32px;border-radius:.5rem;background:rgba(16,185,129,0.2);
+  border:1.5px solid var(--primary-glow);display:flex;align-items:center;justify-content:center;
+  color:var(--primary-glow);box-shadow:0 0 12px rgba(52,211,153,0.5);
+}
+.brand-text{font-size:1.05rem;font-weight:900;letter-spacing:.02em;color:#fff}
+.brand-pill{
+  font-size:9px;font-weight:800;padding:2px 6px;border-radius:99px;
+  background:linear-gradient(90deg, #10b981, #06b6d4);color:#03120c;
+  text-transform:uppercase;letter-spacing:.06em;margin-left:.4rem;
+}
+.nav-actions{display:flex;align-items:center;gap:.55rem}
+.btn-pill{
+  display:inline-flex;align-items:center;gap:.35rem;padding:.38rem .75rem;border-radius:.55rem;
+  font-size:.72rem;font-weight:700;transition:all .2s;background:rgba(15,23,42,0.8);
+  border:1px solid rgba(255,255,255,0.12);color:var(--text-sub);
+}
+.btn-pill:hover{background:rgba(255,255,255,0.12);color:#fff;border-color:var(--primary-glow)}
+.btn-pill.primary{background:var(--primary-glow);color:#04140e;box-shadow:0 0 16px rgba(52,211,153,0.5);border:none}
+.btn-pill.primary:hover{transform:scale(1.02);box-shadow:0 0 24px rgba(52,211,153,0.8)}
+
+/* ── Main Container ────────────────────────────────────────────────── */
+.main-wrapper{
+  max-width:1200px;margin:1rem auto 3rem;padding:0 1rem;display:flex;flex-direction:column;gap:1rem;
+}
+
+/* ── Video Player Canvas Stage ─────────────────────────────────────── */
+.player-container{
+  position:relative;width:100%;aspect-ratio:16/9;
+  background:#000;border-radius:1rem;overflow:hidden;
+  border:2px solid rgba(52,211,153,0.35);box-shadow:0 15px 50px rgba(0,0,0,0.9), 0 0 30px rgba(52,211,153,0.2);
+}
+#videoCanvas{
+  width:100%;height:100%;display:block;
+}
+
+/* Big Play Overlay (Before Start) */
+.play-overlay{
+  position:absolute;inset:0;background:rgba(3,7,18,0.85);backdrop-filter:blur(10px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:1rem;z-index:20;transition:opacity .3s;cursor:pointer;
+}
+.play-overlay.hidden{opacity:0;pointer-events:none}
+.play-ring{
+  width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg, #10b981, #06b6d4);
+  display:flex;align-items:center;justify-content:center;color:#021512;font-size:2.4rem;
+  box-shadow:0 0 40px rgba(52,211,153,0.7);transition:all .25s ease;padding-left:6px;
+}
+.play-ring:hover{transform:scale(1.1);box-shadow:0 0 60px rgba(52,211,153,1)}
+.play-title{font-size:1.5rem;font-weight:900;color:#fff;text-align:center;letter-spacing:.02em}
+.play-subtitle{font-size:.85rem;color:var(--text-sub);max-width:540px;text-align:center;line-height:1.4}
+
+/* Subtitle HUD Bar */
+.subtitle-hud{
+  position:absolute;bottom:70px;left:50%;transform:translateX(-50%);
+  width:calc(100% - 40px);max-width:980px;pointer-events:none;z-index:15;
+  text-align:center;
+}
+.sub-tag{
+  display:inline-block;font-size:10px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.1em;padding:2px 8px;border-radius:.35rem;background:rgba(52,211,153,0.2);
+  border:1px solid var(--primary-glow);color:var(--primary-glow);margin-bottom:.35rem;
+}
+.sub-text{
+  background:rgba(2,6,18,0.88);border:1px solid rgba(255,255,255,0.15);
+  border-radius:.65rem;padding:.65rem 1.25rem;font-size:1.15rem;font-weight:700;
+  color:#fff;backdrop-filter:blur(16px);line-height:1.4;display:inline-block;
+  box-shadow:0 8px 30px rgba(0,0,0,0.8);letter-spacing:.01em;
+}
+.sub-highlight{color:var(--primary-glow);text-shadow:0 0 10px rgba(52,211,153,0.6)}
+
+/* ── Custom Player Controls Bar ────────────────────────────────────── */
+.controls-bar{
+  position:absolute;bottom:0;left:0;right:0;height:56px;
+  background:linear-gradient(to top, rgba(2,6,18,0.98), rgba(2,6,18,0.7));
+  border-top:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;
+  justify-content:space-between;padding:0 1rem;z-index:15;gap:.75rem;
+}
+.ctl-left{display:flex;align-items:center;gap:.65rem}
+.ctl-btn{
+  width:36px;height:36px;border-radius:.5rem;background:rgba(255,255,255,0.08);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;
+  transition:all .2s;
+}
+.ctl-btn:hover{background:rgba(52,211,153,0.25);color:var(--primary-glow)}
+.time-display{font-size:.75rem;font-family:'JetBrains Mono',monospace;color:#cbd5e1;white-space:nowrap}
+
+/* Progress / Seekbar */
+.seekbar-wrapper{flex:1;position:relative;height:8px;background:rgba(255,255,255,0.15);border-radius:4px;cursor:pointer}
+.seekbar-fill{height:100%;width:0%;background:linear-gradient(90deg, #10b981, #06b6d4);border-radius:4px;position:relative}
+.seekbar-head{
+  position:absolute;right:-6px;top:-4px;width:16px;height:16px;border-radius:50%;
+  background:#fff;box-shadow:0 0 12px #34d399;display:none;
+}
+.seekbar-wrapper:hover .seekbar-head{display:block}
+
+.ctl-right{display:flex;align-items:center;gap:.5rem}
+
+/* ── Scene Navigator Chapters ──────────────────────────────────────── */
+.scene-chapters{
+  display:grid;grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));gap:.65rem;
+}
+.chap-card{
+  background:rgba(15,23,42,0.7);border:1px solid rgba(255,255,255,0.1);border-radius:.75rem;
+  padding:.75rem;display:flex;flex-direction:column;gap:.3rem;transition:all .2s;cursor:pointer;
+}
+.chap-card:hover{background:rgba(255,255,255,0.08);border-color:var(--primary-glow);transform:translateY(-2px)}
+.chap-card.active{
+  background:linear-gradient(135deg, rgba(16,185,129,0.2), rgba(6,182,212,0.15));
+  border-color:var(--primary-glow);box-shadow:0 0 18px rgba(52,211,153,0.3);
+}
+.chap-head{display:flex;align-items:center;justify-content:space-between}
+.chap-time{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--primary-glow);font-weight:700}
+.chap-title{font-size:.8rem;font-weight:800;color:#fff}
+.chap-desc{font-size:.68rem;color:var(--text-sub);line-height:1.3}
+
+/* ── Info Specs & Recording Banner ─────────────────────────────────── */
+.specs-panel{
+  background:rgba(8,14,26,0.9);border:1px solid rgba(52,211,153,0.25);border-radius:.85rem;
+  padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+}
+.specs-left{display:flex;flex-direction:column;gap:.25rem}
+.specs-title{font-size:.9rem;font-weight:800;color:#fff;display:flex;align-items:center;gap:.45rem}
+.specs-sub{font-size:.72rem;color:var(--text-sub)}
+.rec-status{
+  display:none;align-items:center;gap:.45rem;padding:.35rem .75rem;border-radius:.5rem;
+  background:rgba(239,68,68,0.2);border:1px solid #ef4444;color:#fca5a5;font-size:.7rem;font-weight:800;
+}
+.rec-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;box-shadow:0 0 8px #ef4444;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+
+@media(max-width:768px){
+  .sub-text{font-size:.88rem;padding:.5rem .85rem}
+  .scene-chapters{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOP BAR ── -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <div class="brand-text">SiloGuard <span class="brand-pill">AI Video Studio</span></div>
+  </div>
+  <div class="nav-actions">
+    <a href="index.html" class="btn-pill" title="Back to Master Hub">
+      <span>🎛️ Master Hub</span>
+    </a>
+    <a href="SiloGuard.html" class="btn-pill" title="60% Grain Silo">
+      <span>🌾 SiloGuard</span>
+    </a>
+    <a href="biofuel_recovery.html" class="btn-pill" title="40% Biofuel">
+      <span>⚡ Biofuel</span>
+    </a>
+    <button class="btn-pill primary" id="btnDownloadVideo" onclick="exportRecordedVideo()" title="Export & download full video as MP4/WebM">
+      <span>🎥 Download Video</span>
+    </button>
+  </div>
+</header>
+
+<!-- ── MAIN WRAPPER ── -->
+<div class="main-wrapper">
+
+  <!-- VIDEO PLAYER STAGE -->
+  <div class="player-container" id="playerContainer">
+    <canvas id="videoCanvas" width="1920" height="1080"></canvas>
+
+    <!-- Initial Play Screen Overlay -->
+    <div class="play-overlay" id="playOverlay" onclick="togglePlay()">
+      <div class="play-ring">▶</div>
+      <h1 class="play-title">SiloGuard — 2.5-Minute Cinematic Explainer</h1>
+      <p class="play-subtitle">
+        Watch the AI digital twin detect invisible micro-climates, activate the 2-minute crisis defense, alert farmers at +91 8220480281, and convert compromised grain into 418 kW clean biofuel.
+      </p>
+    </div>
+
+    <!-- Dynamic Subtitle HUD -->
+    <div class="subtitle-hud" id="subtitleHud">
+      <span class="sub-tag" id="subTag">SCENE 1 · THE INVISIBLE CRISIS</span><br/>
+      <div class="sub-text" id="subText">
+        Across the world, millions of tons of harvested food grain are lost inside massive storage silos.
+      </div>
+    </div>
+
+    <!-- Player Controls Bar -->
+    <div class="controls-bar">
+      <div class="ctl-left">
+        <button class="ctl-btn" id="btnPlayPause" onclick="togglePlay()" title="Play / Pause">▶</button>
+        <button class="ctl-btn" onclick="restartVideo()" title="Restart from 0:00">⏮</button>
+        <div class="time-display" id="timeDisplay">00:00 / 02:30</div>
+      </div>
+
+      <!-- Seekbar -->
+      <div class="seekbar-wrapper" id="seekbar" onclick="seekVideo(event)">
+        <div class="seekbar-fill" id="seekbarFill">
+          <div class="seekbar-head"></div>
+        </div>
+      </div>
+
+      <div class="ctl-right">
+        <button class="ctl-btn" id="btnSubToggle" onclick="toggleSubtitles()" title="Toggle Subtitles">💬</button>
+        <button class="ctl-btn" id="btnSoundToggle" onclick="toggleSound()" title="Mute / Unmute">🔊</button>
+        <button class="ctl-btn" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE CHAPTER MARKERS -->
+  <div class="scene-chapters">
+    <div class="chap-card active" id="chap-0" onclick="jumpToScene(0)">
+      <div class="chap-head"><span>🌾 Scene 1</span><span class="chap-time">0:00</span></div>
+      <div class="chap-title">The Invisible Crisis</div>
+      <div class="chap-desc">Microscopic grain spore spikes 72 hours before visible detection.</div>
+    </div>
+    <div class="chap-card" id="chap-1" onclick="jumpToScene(1)">
+      <div class="chap-head"><span>🏛️ Scene 2</span><span class="chap-time">0:24</span></div>
+      <div class="chap-title">75-Voxel 3D Twin</div>
+      <div class="chap-desc">3D multi-depth thermal mesh across surface, mid, and deep core.</div>
+    </div>
+    <div class="chap-card" id="chap-2" onclick="jumpToScene(2)">
+      <div class="chap-head"><span>🚨 Scene 3</span><span class="chap-time">0:48</span></div>
+      <div class="chap-title">Predictive AI Crisis</div>
+      <div class="chap-desc">2-minute emergency countdown, sirens, and turbo ventilation fans.</div>
+    </div>
+    <div class="chap-card" id="chap-3" onclick="jumpToScene(3)">
+      <div class="chap-head"><span>📱 Scene 4</span><span class="chap-time">1:09</span></div>
+      <div class="chap-title">Farmer Dispatch</div>
+      <div class="chap-desc">Direct WhatsApp & SMS to 8220480281 + 35% liquidation auction.</div>
+    </div>
+    <div class="chap-card" id="chap-4" onclick="jumpToScene(4)">
+      <div class="chap-head"><span>⚡ Scene 5</span><span class="chap-time">1:32</span></div>
+      <div class="chap-title">40% Biofuel Plant</div>
+      <div class="chap-desc">Anaerobic methanogenesis: 74% pure biogas & 418 kW power.</div>
+    </div>
+    <div class="chap-card" id="chap-5" onclick="jumpToScene(5)">
+      <div class="chap-head"><span>👑 Scene 6</span><span class="chap-time">1:56</span></div>
+      <div class="chap-title">Circular Economy</div>
+      <div class="chap-desc">Synchronized 60/40 circular loop: zero waste, clean energy.</div>
+    </div>
+  </div>
+
+  <!-- SPECS & EXPORT PANEL -->
+  <div class="specs-panel">
+    <div class="specs-left">
+      <div class="specs-title">
+        <span>🎬 2-Minute 30-Second AI Video Presentation Engine</span>
+      </div>
+      <div class="specs-sub">
+        Full 1080p 60FPS generative canvas rendering with synchronized voiceover narration, audio synthesis, and live animated subtitles.
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:.65rem">
+      <div class="rec-status" id="recStatus"><span class="rec-dot"></span><span>RECORDING CANVAS...</span></div>
+      <button class="btn-pill primary" onclick="exportRecordedVideo()">
+        <span>⏺ Export Video File (MP4/WebM)</span>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Audio narration elements (generated WAVs) -->
+<audio id="snd-scene0" src="audio/scene1.wav" preload="auto"></audio>
+<audio id="snd-scene1" src="audio/scene2.wav" preload="auto"></audio>
+<audio id="snd-scene2" src="audio/scene3.wav" preload="auto"></audio>
+<audio id="snd-scene3" src="audio/scene4.wav" preload="auto"></audio>
+<audio id="snd-scene4" src="audio/scene5.wav" preload="auto"></audio>
+<audio id="snd-scene5" src="audio/scene6.wav" preload="auto"></audio>
+
+<script>
+'use strict';
+
+/* ── SCENE & SUBTITLE TIMING DATA (Total: 150 Seconds / 2.5 Minutes) ── */
+var TOTAL_DURATION = 142; // Seconds
+var scenes = [
+  {
+    index: 0,
+    startTime: 0,
+    endTime: 24,
+    tag: "SCENE 1 · THE INVISIBLE CRISIS",
+    subtitles: [
+      { start: 0, end: 6.5, text: "Across the world, millions of tons of harvested food grain are lost inside massive storage silos." },
+      { start: 6.5, end: 12.5, text: "The real threat is not external—it is an unseen enemy deep inside the grain core." },
+      { start: 12.5, end: 18.5, text: "Heat spots and moisture multiply fungal spores 72 hours before visible signs appear." },
+      { start: 18.5, end: 24.0, text: "Meet SiloGuard: the software-defined agritech digital twin." }
+    ]
+  },
+  {
+    index: 1,
+    startTime: 24,
+    endTime: 48,
+    tag: "SCENE 2 · 3D DIGITAL TWIN & 75 VOXELS",
+    subtitles: [
+      { start: 24.0, end: 30.5, text: "SiloGuard transforms conventional grain silos into intelligent cyber-physical digital twins." },
+      { start: 30.5, end: 37.0, text: "Powered by 75 multi-depth sensors mapped across surface, mid, and deep core zones..." },
+      { start: 37.0, end: 42.5, text: "...SiloGuard monitors micro-climates voxel by voxel with zero blind spots." },
+      { start: 42.5, end: 48.0, text: "Operators zoom smoothly into individual voxel layers with crisp precision." }
+    ]
+  },
+  {
+    index: 2,
+    startTime: 48,
+    endTime: 69,
+    tag: "SCENE 3 · PREDICTIVE AI & CRISIS DEFENSE",
+    subtitles: [
+      { start: 48.0, end: 54.5, text: "Our biological kinetic model computes fungal acceleration and safe storage time in real time." },
+      { start: 54.5, end: 60.5, text: "When thermal runaway is detected, SiloGuard triggers autonomous defense." },
+      { start: 60.5, end: 65.5, text: "Turbo aeration fans engage, acoustic alarms sound..." },
+      { start: 65.5, end: 69.0, text: "...and life-saving voice alerts broadcast in English, Tamil, and Hindi." }
+    ]
+  },
+  {
+    index: 3,
+    startTime: 69,
+    endTime: 92,
+    tag: "SCENE 4 · DIRECT FARMER DISPATCH (+91 8220480281)",
+    subtitles: [
+      { start: 69.0, end: 74.5, text: "Zero lag. The farmer immediately receives an emergency alert directly on their mobile phone." },
+      { start: 74.5, end: 81.0, text: "Instant WhatsApp, cellular SMS, and push notifications sent to target number +91 8220480281." },
+      { start: 81.0, end: 87.0, text: "Simultaneously, SiloGuard launches a dynamic liquidation auction..." },
+      { start: 87.0, end: 92.0, text: "...connecting regional flour mills to rescue grain capital before spoilage occurs." }
+    ]
+  },
+  {
+    index: 4,
+    startTime: 92,
+    endTime: 115,
+    tag: "SCENE 5 · 40% CIRCULAR BIOFUEL FACILITY",
+    subtitles: [
+      { start: 92.0, end: 97.5, text: "What happens to unsalvageable grain? With SiloGuard, nothing goes to waste." },
+      { start: 97.5, end: 103.5, text: "The compromised 40% is automatically diverted into an anaerobic bio-reactor." },
+      { start: 103.5, end: 110.0, text: "Through controlled methanogenesis, damaged grain converts into 74% pure biomethane..." },
+      { start: 110.0, end: 115.0, text: "...generating 418 kilowatts of clean electricity for the rural power grid." }
+    ]
+  },
+  {
+    index: 5,
+    startTime: 115,
+    endTime: 142,
+    tag: "SCENE 6 · THE UNIFIED AGRITECH REVOLUTION",
+    subtitles: [
+      { start: 115.0, end: 122.0, text: "60% premium food grain preserved for human consumption." },
+      { start: 122.0, end: 130.0, text: "40% salvage converted into clean renewable green energy." },
+      { start: 130.0, end: 142.0, text: "SiloGuard: Preserving our harvest, powering our future." }
+    ]
+  }
+];
+
+/* ── Player State ── */
+var isPlaying = false;
+var currentTime = 0;
+var currentSceneIndex = 0;
+var soundMuted = false;
+var subtitlesVisible = true;
+var lastAnimTime = 0;
+var mediaRecorder = null;
+var recordedChunks = [];
+var isRecording = false;
+
+var canvas = document.getElementById('videoCanvas');
+var ctx = canvas.getContext('2d');
+
+/* ── Particles & 3D Geometry for Canvas ── */
+var particles = [];
+for (var i = 0; i < 90; i++) {
+  particles.push({
+    x: Math.random() * 1920,
+    y: Math.random() * 1080,
+    vx: (Math.random() - 0.5) * 1.5,
+    vy: (Math.random() - 0.5) * 1.5,
+    r: Math.random() * 3 + 1,
+    alpha: Math.random() * 0.7 + 0.3
+  });
+}
+
+/* ── Web Audio Synth (Ambient Soundscape + Sirens) ── */
+var audioCtx = null;
+var synthGain = null;
+var sirenOsc = null;
+
+function initAudio() {
+  if (audioCtx) return;
+  try {
+    var AudioContext = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioContext();
+    synthGain = audioCtx.createGain();
+    synthGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+    synthGain.connect(audioCtx.destination);
+  } catch(e){}
+}
+
+function playBeep(freq, dur) {
+  if (!audioCtx || soundMuted) return;
+  try {
+    var osc = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    g.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+    osc.connect(g);
+    g.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch(e){}
+}
+
+/* ── Play / Pause / Seek Logic ── */
+function togglePlay() {
+  initAudio();
+  if (isPlaying) {
+    pauseVideo();
+  } else {
+    playVideo();
+  }
+}
+
+function playVideo() {
+  isPlaying = true;
+  document.getElementById('playOverlay').classList.add('hidden');
+  document.getElementById('btnPlayPause').textContent = '⏸';
+  lastAnimTime = performance.now();
+  syncAudio();
+  requestAnimationFrame(videoLoop);
+}
+
+function pauseVideo() {
+  isPlaying = false;
+  document.getElementById('btnPlayPause').textContent = '▶';
+  stopAllAudio();
+}
+
+function restartVideo() {
+  currentTime = 0;
+  stopAllAudio();
+  if (isPlaying) {
+    syncAudio();
+  } else {
+    renderFrame(0);
+    updateControls();
+  }
+}
+
+function jumpToScene(idx) {
+  var sc = scenes[idx];
+  if (!sc) return;
+  currentTime = sc.startTime;
+  stopAllAudio();
+  syncAudio();
+  if (!isPlaying) {
+    renderFrame(currentTime);
+    updateControls();
+  }
+}
+
+function seekVideo(e) {
+  var bar = document.getElementById('seekbar');
+  var rect = bar.getBoundingClientRect();
+  var ratio = (e.clientX - rect.left) / rect.width;
+  ratio = Math.max(0, Math.min(1, ratio));
+  currentTime = ratio * TOTAL_DURATION;
+  stopAllAudio();
+  syncAudio();
+  if (!isPlaying) {
+    renderFrame(currentTime);
+    updateControls();
+  }
+}
+
+function stopAllAudio() {
+  for (var i = 0; i < scenes.length; i++) {
+    var el = document.getElementById('snd-scene' + i);
+    if (el) { el.pause(); }
+  }
+}
+
+function syncAudio() {
+  if (!isPlaying || soundMuted) return;
+  var curScene = scenes[currentSceneIndex];
+  if (!curScene) return;
+
+  var audioEl = document.getElementById('snd-scene' + currentSceneIndex);
+  if (audioEl) {
+    var offset = currentTime - curScene.startTime;
+    if (offset >= 0 && offset < audioEl.duration) {
+      if (Math.abs(audioEl.currentTime - offset) > 0.3) {
+        audioEl.currentTime = offset;
+      }
+      if (audioEl.paused) {
+        audioEl.play().catch(function(){});
+      }
+    }
+  }
+}
+
+function toggleSound() {
+  soundMuted = !soundMuted;
+  var btn = document.getElementById('btnSoundToggle');
+  btn.textContent = soundMuted ? '🔇' : '🔊';
+  for (var i = 0; i < scenes.length; i++) {
+    var el = document.getElementById('snd-scene' + i);
+    if (el) el.muted = soundMuted;
+  }
+}
+
+function toggleSubtitles() {
+  subtitlesVisible = !subtitlesVisible;
+  document.getElementById('subtitleHud').style.display = subtitlesVisible ? 'block' : 'none';
+  document.getElementById('btnSubToggle').style.color = subtitlesVisible ? '#34d399' : '#64748b';
+}
+
+function toggleFullscreen() {
+  var c = document.getElementById('playerContainer');
+  if (!document.fullscreenElement) {
+    if (c.requestFullscreen) c.requestFullscreen();
+  } else {
+    if (document.exitFullscreen) document.exitFullscreen();
+  }
+}
+
+/* ── Main Canvas Rendering Loop (60 FPS) ── */
+function videoLoop(now) {
+  if (!isPlaying) return;
+  var dt = (now - lastAnimTime) / 1000;
+  lastAnimTime = now;
+  currentTime += dt;
+
+  if (currentTime >= TOTAL_DURATION) {
+    currentTime = TOTAL_DURATION;
+    pauseVideo();
+    document.getElementById('playOverlay').classList.remove('hidden');
+    renderFrame(currentTime);
+    updateControls();
+    return;
+  }
+
+  renderFrame(currentTime);
+  updateControls();
+  requestAnimationFrame(videoLoop);
+}
+
+function updateControls() {
+  // Update time text
+  var curM = Math.floor(currentTime / 60);
+  var curS = Math.floor(currentTime % 60);
+  var totM = Math.floor(TOTAL_DURATION / 60);
+  var totS = Math.floor(TOTAL_DURATION % 60);
+  document.getElementById('timeDisplay').textContent =
+    (curM < 10 ? '0' : '') + curM + ':' + (curS < 10 ? '0' : '') + curS + ' / ' +
+    (totM < 10 ? '0' : '') + totM + ':' + (totS < 10 ? '0' : '') + totS;
+
+  // Update seekbar
+  var pct = (currentTime / TOTAL_DURATION) * 100;
+  document.getElementById('seekbarFill').style.width = pct + '%';
+
+  // Determine current scene
+  var prevScene = currentSceneIndex;
+  for (var i = 0; i < scenes.length; i++) {
+    if (currentTime >= scenes[i].startTime && currentTime < scenes[i].endTime) {
+      currentSceneIndex = i;
+      break;
+    }
+  }
+
+  if (prevScene !== currentSceneIndex) {
+    stopAllAudio();
+    syncAudio();
+    document.querySelectorAll('.chap-card').forEach(function(c, idx){
+      c.classList.toggle('active', idx === currentSceneIndex);
+    });
+  }
+
+  // Update subtitles
+  var sc = scenes[currentSceneIndex];
+  if (sc) {
+    document.getElementById('subTag').textContent = sc.tag;
+    var currentSubText = "";
+    for (var j = 0; j < sc.subtitles.length; j++) {
+      var s = sc.subtitles[j];
+      if (currentTime >= s.start && currentTime <= s.end) {
+        currentSubText = s.text;
+        break;
+      }
+    }
+    if (currentSubText) {
+      document.getElementById('subText').innerHTML = currentSubText.replace(/(SiloGuard|75|40%|60%|8220480281|418 kW|74%)/g, '<span class="sub-highlight">$1</span>');
+    }
+  }
+}
+
+/* ── CINEMATIC CANVAS GENERATOR (1920x1080) ── */
+function renderFrame(time) {
+  var W = 1920, H = 1080;
+  ctx.clearRect(0, 0, W, H);
+
+  // Background deep gradient
+  var bgGrad = ctx.createRadialGradient(W/2, H/2, 100, W/2, H/2, W);
+  bgGrad.addColorStop(0, '#0a1324');
+  bgGrad.addColorStop(1, '#02050c');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Floating background cyber particles
+  ctx.fillStyle = 'rgba(52, 211, 153, 0.4)';
+  particles.forEach(function(p){
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+    if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+    ctx.fill();
+  });
+
+  // Top Global Presentation HUD
+  drawHUD(W, H, time);
+
+  // Render Scene Specific Visuals
+  if (currentSceneIndex === 0) {
+    drawScene1_Crisis(W, H, time);
+  } else if (currentSceneIndex === 1) {
+    drawScene2_DigitalTwin(W, H, time);
+  } else if (currentSceneIndex === 2) {
+    drawScene3_Emergency(W, H, time);
+  } else if (currentSceneIndex === 3) {
+    drawScene4_FarmerDispatch(W, H, time);
+  } else if (currentSceneIndex === 4) {
+    drawScene5_BiofuelPlant(W, H, time);
+  } else {
+    drawScene6_UnifiedOutro(W, H, time);
+  }
+}
+
+/* ── HUD Overlay ── */
+function drawHUD(W, H, time) {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(52,211,153,0.2)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(40, 40, W - 80, H - 80);
+
+  // Corner brackets
+  var len = 30;
+  ctx.strokeStyle = '#34d399';
+  ctx.lineWidth = 3;
+  // TL
+  ctx.beginPath(); ctx.moveTo(40, 40+len); ctx.lineTo(40, 40); ctx.lineTo(40+len, 40); ctx.stroke();
+  // TR
+  ctx.beginPath(); ctx.moveTo(W-40-len, 40); ctx.lineTo(W-40, 40); ctx.lineTo(W-40, 40+len); ctx.stroke();
+  // BL
+  ctx.beginPath(); ctx.moveTo(40, H-40-len); ctx.lineTo(40, H-40); ctx.lineTo(40+len, H-40); ctx.stroke();
+  // BR
+  ctx.beginPath(); ctx.moveTo(W-40-len, H-40); ctx.lineTo(W-40, H-40); ctx.lineTo(W-40, H-40-len); ctx.stroke();
+
+  // Top Left Live Stamp
+  ctx.fillStyle = '#34d399';
+  ctx.font = 'bold 20px "JetBrains Mono", monospace';
+  ctx.fillText('● SILOGUARD AI ENGINE · 1Hz TELEMETRY', 70, 75);
+
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '16px "JetBrains Mono", monospace';
+  ctx.fillText('LIVE DEMO STREAM · HARD RED WHEAT SILO #4', 70, 102);
+
+  // Top Right Timestamp
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#f8fafc';
+  ctx.fillText('TICK ' + (Math.floor(time * 30) + 10420), W - 70, 75);
+  ctx.fillStyle = '#38bdf8';
+  ctx.fillText('75/75 VOXELS ONLINE', W - 70, 102);
+  ctx.textAlign = 'left';
+
+  ctx.restore();
+}
+
+/* ── Scene 1: The Invisible Crisis ── */
+function drawScene1_Crisis(W, H, time) {
+  var t = time;
+  ctx.save();
+
+  // Title Card
+  ctx.fillStyle = '#f87171';
+  ctx.font = 'bold 28px "Outfit", sans-serif';
+  ctx.fillText('THE POST-HARVEST DILEMMA', W/2 - 200, 180);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 68px "Outfit", sans-serif';
+  ctx.fillText('The Invisible Spoilage Crisis', W/2 - 420, 260);
+
+  // Silo Cross-Section Graphic
+  var cx = W/2, cy = H/2 + 70, sW = 440, sH = 460;
+  ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(cx - sW/2, cy - sH/2, sW, sH);
+
+  // Grain fill with heat gradient
+  var grainGrad = ctx.createLinearGradient(cx, cy - sH/2, cx, cy + sH/2);
+  grainGrad.addColorStop(0, '#d97706');
+  grainGrad.addColorStop(0.5, '#dc2626');
+  grainGrad.addColorStop(1, '#78350f');
+  ctx.fillStyle = grainGrad;
+  ctx.fillRect(cx - sW/2 + 4, cy - sH/2 + 4, sW - 8, sH - 8);
+
+  // Thermal anomaly pulse in core
+  var pulse = (Math.sin(t * 5) + 1) / 2;
+  var rad = 60 + pulse * 45;
+  var coreGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, rad);
+  coreGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+  coreGrad.addColorStop(0.4, 'rgba(239, 68, 68, 0.9)');
+  coreGrad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+  ctx.fillStyle = coreGrad;
+  ctx.beginPath();
+  ctx.arc(cx, cy, rad, 0, Math.PI*2);
+  ctx.fill();
+
+  // Callout warning
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 24px "JetBrains Mono", monospace';
+  ctx.fillText('⚠️ UNNOTICED CORE HOTSPOT', cx + 180, cy - 20);
+  ctx.fillStyle = '#fca5a5';
+  ctx.font = '20px "JetBrains Mono", monospace';
+  ctx.fillText('+14.2°C Thermal Anomaly', cx + 180, cy + 15);
+  ctx.fillText('Fungal Spores Multiplied 72h Prior', cx + 180, cy + 45);
+
+  ctx.restore();
+}
+
+/* ── Scene 2: 75-Voxel 3D Digital Twin ── */
+function drawScene2_DigitalTwin(W, H, time) {
+  var t = time;
+  ctx.save();
+
+  // Title
+  ctx.fillStyle = '#34d399';
+  ctx.font = 'bold 28px "Outfit", sans-serif';
+  ctx.fillText('PROPRIETARY AGRITECH TELEMETRY', W/2 - 240, 170);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 64px "Outfit", sans-serif';
+  ctx.fillText('75-Voxel Multi-Depth Grid', W/2 - 380, 245);
+
+  // 3-Layer Voxel Visualization (Surface, Mid, Deep Core)
+  var layers = [
+    { name: 'SURFACE LAYER (25 VOXELS)', yOff: 400, color: '#34d399', temp: '21.4°C' },
+    { name: 'MID-DEPTH LAYER (25 VOXELS)', yOff: 550, color: '#fbbf24', temp: '28.6°C' },
+    { name: 'DEEP-CORE LAYER (25 VOXELS)', yOff: 700, color: '#ef4444', temp: '43.8°C' }
+  ];
+
+  var cols = 5;
+  var cellSize = 42;
+  var gap = 12;
+  var gridW = cols * (cellSize + gap);
+
+  layers.forEach(function(lay, lIdx){
+    var startX = W/2 - gridW/2;
+    var startY = lay.yOff - 50;
+
+    ctx.fillStyle = lay.color;
+    ctx.font = 'bold 18px "JetBrains Mono", monospace';
+    ctx.fillText(lay.name + ' · CORE T: ' + lay.temp, startX, startY - 14);
+
+    for (var r = 0; r < 2; r++) {
+      for (var c = 0; c < cols; c++) {
+        var x = startX + c * (cellSize + gap);
+        var y = startY + r * (cellSize + gap);
+        
+        ctx.fillStyle = (lIdx === 2 && c === 2) ? '#ef4444' : (lIdx === 1 ? '#f59e0b' : '#10b981');
+        ctx.shadowColor = ctx.fillStyle;
+        ctx.shadowBlur = (lIdx === 2 && c === 2) ? 25 : 8;
+        ctx.fillRect(x, y, cellSize, cellSize);
+        ctx.shadowBlur = 0;
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(x, y, cellSize, cellSize);
+      }
+    }
+  });
+
+  // Zoom Controls HUD Mockup
+  ctx.fillStyle = 'rgba(15,23,42,0.9)';
+  ctx.strokeStyle = '#34d399';
+  ctx.lineWidth = 2;
+  ctx.fillRect(W/2 + 280, 520, 260, 110);
+  ctx.strokeRect(W/2 + 280, 520, 260, 110);
+
+  ctx.fillStyle = '#34d399';
+  ctx.font = 'bold 16px "JetBrains Mono", monospace';
+  ctx.fillText('DYNAMIC ZOOM CONTROLS', W/2 + 300, 555);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 22px "JetBrains Mono", monospace';
+  ctx.fillText('[-]  [82%]  [+]  [FIT]', W/2 + 300, 600);
+
+  ctx.restore();
+}
+
+/* ── Scene 3: Predictive AI & Emergency Defense ── */
+function drawScene3_Emergency(W, H, time) {
+  var t = time;
+  ctx.save();
+
+  // Strobe Alarm background pulse
+  var alarmFlash = Math.sin(t * 8) > 0;
+  if (alarmFlash) {
+    ctx.fillStyle = 'rgba(239, 68, 68, 0.15)';
+    ctx.fillRect(40, 40, W - 80, H - 80);
+  }
+
+  // Header Title
+  ctx.fillStyle = '#ef4444';
+  ctx.font = 'bold 28px "Outfit", sans-serif';
+  ctx.fillText('AUTONOMOUS CRISIS RESPONSE', W/2 - 240, 170);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 64px "Outfit", sans-serif';
+  ctx.fillText('Predictive Kinetic Intercept', W/2 - 400, 245);
+
+  // Emergency Card
+  var cardW = 900, cardH = 460;
+  var cx = W/2, cy = H/2 + 80;
+  ctx.fillStyle = 'rgba(9, 13, 22, 0.95)';
+  ctx.strokeStyle = '#ef4444';
+  ctx.lineWidth = 3;
+  ctx.shadowColor = 'rgba(239,68,68,0.6)';
+  ctx.shadowBlur = 30;
+  ctx.fillRect(cx - cardW/2, cy - cardH/2, cardW, cardH);
+  ctx.strokeRect(cx - cardW/2, cy - cardH/2, cardW, cardH);
+  ctx.shadowBlur = 0;
+
+  // Emergency Timer Badge
+  ctx.fillStyle = '#ef4444';
+  ctx.font = 'bold 44px "JetBrains Mono", monospace';
+  ctx.fillText('🚨 2-MINUTE THERMAL CRISIS COUNTDOWN: ACTIVE', cx - cardW/2 + 50, cy - cardH/2 + 75);
+
+  // Formulas Grid
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  ctx.fillRect(cx - cardW/2 + 50, cy - cardH/2 + 120, 380, 130);
+  ctx.fillRect(cx + 20, cy - cardH/2 + 120, 430, 130);
+
+  ctx.fillStyle = '#38bdf8';
+  ctx.font = 'bold 20px "JetBrains Mono", monospace';
+  ctx.fillText('FUNGAL ACCELERATION (Af)', cx - cardW/2 + 70, cy - cardH/2 + 160);
+  ctx.fillStyle = '#f87171';
+  ctx.font = '900 42px "JetBrains Mono", monospace';
+  ctx.fillText('5.42x EXPONENTIAL', cx - cardW/2 + 70, cy - cardH/2 + 215);
+
+  ctx.fillStyle = '#34d399';
+  ctx.font = 'bold 20px "JetBrains Mono", monospace';
+  ctx.fillText('SAFE STORAGE REMAINING (S_rem)', cx + 40, cy - cardH/2 + 160);
+  ctx.fillStyle = '#f87171';
+  ctx.font = '900 42px "JetBrains Mono", monospace';
+  ctx.fillText('22.8 HOURS', cx + 40, cy - cardH/2 + 215);
+
+  // Countermeasures checklist
+  ctx.fillStyle = '#a7f3d0';
+  ctx.font = 'bold 22px "Outfit", sans-serif';
+  ctx.fillText('✔ Forced Turbo Aeration Fans Engaged at 100% RPM', cx - cardW/2 + 70, cy + 60);
+  ctx.fillText('✔ Dynamic Liquidation Auction Dispatched (35% Discount)', cx - cardW/2 + 70, cy + 105);
+  ctx.fillText('✔ Voice Alerts Broadcasted in English / தமிழ் / हिन्दी', cx - cardW/2 + 70, cy + 150);
+
+  ctx.restore();
+}
+
+/* ── Scene 4: Instant Farmer Dispatch ── */
+function drawScene4_FarmerDispatch(W, H, time) {
+  var t = time;
+  ctx.save();
+
+  // Title
+  ctx.fillStyle = '#38bdf8';
+  ctx.font = 'bold 28px "Outfit", sans-serif';
+  ctx.fillText('FARMER DIRECT OMNI-CHANNEL ALERTS', W/2 - 270, 170);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 64px "Outfit", sans-serif';
+  ctx.fillText('Instant Mobile & SMS Defense', W/2 - 420, 245);
+
+  // Mobile Phone Mockup
+  var phW = 460, phH = 540;
+  var px = W/2 - 260, py = H/2 + 70;
+  ctx.fillStyle = '#0f172a';
+  ctx.strokeStyle = '#38bdf8';
+  ctx.lineWidth = 4;
+  ctx.shadowColor = 'rgba(56,189,248,0.5)';
+  ctx.shadowBlur = 25;
+  ctx.fillRect(px - phW/2, py - phH/2, phW, phH);
+  ctx.strokeRect(px - phW/2, py - phH/2, phW, phH);
+  ctx.shadowBlur = 0;
+
+  // Phone Header
+  ctx.fillStyle = '#1e293b';
+  ctx.fillRect(px - phW/2, py - phH/2, phW, 60);
+  ctx.fillStyle = '#22c55e';
+  ctx.font = 'bold 20px "Outfit", sans-serif';
+  ctx.fillText('🟢 WhatsApp · Farmer Alert (+91 8220480281)', px - phW/2 + 20, py - phH/2 + 38);
+
+  // Message Bubble
+  ctx.fillStyle = '#064e3b';
+  ctx.strokeStyle = '#10b981';
+  ctx.lineWidth = 2;
+  ctx.fillRect(px - phW/2 + 20, py - phH/2 + 80, phW - 40, 220);
+  ctx.strokeRect(px - phW/2 + 20, py - phH/2 + 80, phW - 40, 220);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 18px "JetBrains Mono", monospace';
+  ctx.fillText('🚨 SILOGUARD FARMER ALERT', px - phW/2 + 40, py - phH/2 + 120);
+  ctx.font = '15px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#cbd5e1';
+  ctx.fillText('Silo #4 Deep Core temp: 43.8°C.', px - phW/2 + 40, py - phH/2 + 155);
+  ctx.fillText('Safe Storage Remaining: 22.8 Hours.', px - phW/2 + 40, py - phH/2 + 185);
+  ctx.fillText('40% Diverted to Clean Biofuel Plant.', px - phW/2 + 40, py - phH/2 + 215);
+  ctx.fillText('Live Digital Twin: siloguard.dev', px - phW/2 + 40, py - phH/2 + 245);
+
+  // SMS & Push notification pill
+  ctx.fillStyle = '#0284c7';
+  ctx.fillRect(px - phW/2 + 20, py - phH/2 + 330, phW - 40, 75);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 17px "Outfit", sans-serif';
+  ctx.fillText('💬 Cellular SMS Dispatched to 8220480281', px - phW/2 + 40, py - phH/2 + 372);
+
+  // Dynamic Auction Card on Right
+  var ax = W/2 + 270;
+  ctx.fillStyle = 'rgba(15,23,42,0.95)';
+  ctx.strokeStyle = '#f59e0b';
+  ctx.lineWidth = 3;
+  ctx.fillRect(ax - 220, py - phH/2, 440, phH);
+  ctx.strokeRect(ax - 220, py - phH/2, 440, phH);
+
+  ctx.fillStyle = '#f59e0b';
+  ctx.font = 'bold 24px "Outfit", sans-serif';
+  ctx.fillText('DYNAMIC LIQUIDATION AUCTION', ax - 190, py - phH/2 + 60);
+
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 48px "JetBrains Mono", monospace';
+  ctx.fillText('35% OFF', ax - 190, py - phH/2 + 130);
+
+  ctx.fillStyle = '#cbd5e1';
+  ctx.font = '16px "Outfit", sans-serif';
+  ctx.fillText('Automated flash batch auction', ax - 190, py - phH/2 + 175);
+  ctx.fillText('dispatched to regional flour mills', ax - 190, py - phH/2 + 205);
+  ctx.fillText('to prevent $46,500 grain inventory loss.', ax - 190, py - phH/2 + 235);
+
+  ctx.restore();
+}
+
+/* ── Scene 5: 40% Circular Biofuel Power Plant ── */
+function drawScene5_BiofuelPlant(W, H, time) {
+  var t = time;
+  ctx.save();
+
+  // Cyan theme glow
+  ctx.fillStyle = '#06b6d4';
+  ctx.font = 'bold 28px "Outfit", sans-serif';
+  ctx.fillText('CIRCULAR BIO-ENERGY VALORIZATION', W/2 - 270, 170);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 64px "Outfit", sans-serif';
+  ctx.fillText('40% Anaerobic Biofuel Power Plant', W/2 - 500, 245);
+
+  // Dial 1: Methane Purity
+  var d1X = W/2 - 260, dY = H/2 + 70, dR = 140;
+  ctx.strokeStyle = 'rgba(6,182,212,0.3)';
+  ctx.lineWidth = 14;
+  ctx.beginPath();
+  ctx.arc(d1X, dY, dR, 0, Math.PI*2);
+  ctx.stroke();
+
+  ctx.strokeStyle = '#06b6d4';
+  ctx.beginPath();
+  ctx.arc(d1X, dY, dR, -Math.PI/2, Math.PI * 0.74);
+  ctx.stroke();
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '900 52px "JetBrains Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('74.2%', d1X, dY + 10);
+  ctx.font = 'bold 18px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#38bdf8';
+  ctx.fillText('CH₄ METHANE PURITY', d1X, dY + 50);
+
+  // Dial 2: Electricity Output
+  var d2X = W/2 + 260;
+  ctx.strokeStyle = 'rgba(16,185,129,0.3)';
+  ctx.beginPath();
+  ctx.arc(d2X, dY, dR, 0, Math.PI*2);
+  ctx.stroke();
+
+  ctx.strokeStyle = '#10b981';
+  ctx.beginPath();
+  ctx.arc(d2X, dY, dR, -Math.PI/2, Math.PI * 0.82);
+  ctx.stroke();
+
+  ctx.fillStyle = '#fff';
+  ctx.font = '900 52px "JetBrains Mono", monospace';
+  ctx.fillText('418 kW', d2X, dY + 10);
+  ctx.font = 'bold 18px "JetBrains Mono", monospace';
+  ctx.fillStyle = '#34d399';
+  ctx.fillText('CLEAN GRID POWER', d2X, dY + 50);
+
+  // Reactor Bubbling Icon at center
+  ctx.fillStyle = '#06b6d4';
+  ctx.font = 'bold 36px "Outfit", sans-serif';
+  ctx.fillText('⚡ ➔ ♻️ ➔ 🌾', W/2, dY);
+
+  ctx.textAlign = 'left';
+  ctx.restore();
+}
+
+/* ── Scene 6: The Unified Agritech Revolution ── */
+function drawScene6_UnifiedOutro(W, H, time) {
+  var t = time;
+  ctx.save();
+
+  // Final Logo & Presentation Grand Finale
+  ctx.fillStyle = '#34d399';
+  ctx.font = 'bold 32px "Outfit", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('THE SOFTWARE-DEFINED AGRITECH REVOLUTION', W/2, 200);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 82px "Outfit", sans-serif';
+  ctx.fillText('SiloGuard AI', W/2, 290);
+
+  // 60 / 40 Split Showcase Banner
+  var bW = 880, bH = 160;
+  var bx = W/2 - bW/2, by = 350;
+
+  ctx.fillStyle = 'rgba(16, 185, 129, 0.18)';
+  ctx.strokeStyle = '#34d399';
+  ctx.lineWidth = 3;
+  ctx.fillRect(bx, by, bW/2 - 10, bH);
+  ctx.strokeRect(bx, by, bW/2 - 10, bH);
+
+  ctx.fillStyle = '#34d399';
+  ctx.font = '900 48px "JetBrains Mono", monospace';
+  ctx.fillText('60%', bx + bW/4 - 5, by + 65);
+  ctx.font = 'bold 20px "Outfit", sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.fillText('Food Grain Preserved', bx + bW/4 - 5, by + 115);
+
+  ctx.fillStyle = 'rgba(6, 182, 212, 0.18)';
+  ctx.strokeStyle = '#06b6d4';
+  ctx.fillRect(bx + bW/2 + 10, by, bW/2 - 10, bH);
+  ctx.strokeRect(bx + bW/2 + 10, by, bW/2 - 10, bH);
+
+  ctx.fillStyle = '#06b6d4';
+  ctx.font = '900 48px "JetBrains Mono", monospace';
+  ctx.fillText('40%', bx + 3*bW/4 + 5, by + 65);
+  ctx.font = 'bold 20px "Outfit", sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.fillText('Biofuel Clean Energy', bx + 3*bW/4 + 5, by + 115);
+
+  // Call to Action
+  ctx.fillStyle = '#f8fafc';
+  ctx.font = 'bold 26px "JetBrains Mono", monospace';
+  ctx.fillText('github.com/karuneshp24/siloguard', W/2, 590);
+
+  ctx.textAlign = 'left';
+  ctx.restore();
+}
+
+/* ── Export Video Function (MediaRecorder) ── */
+function exportRecordedVideo() {
+  if (isRecording) {
+    if (mediaRecorder) mediaRecorder.stop();
+    return;
+  }
+
+  initAudio();
+  isRecording = true;
+  document.getElementById('recStatus').style.display = 'flex';
+  document.getElementById('btnDownloadVideo').textContent = '⏹ Stop & Save';
+
+  restartVideo();
+  playVideo();
+
+  var stream = canvas.captureStream(30);
+  var options = { mimeType: 'video/webm;codecs=vp9' };
+  if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+    options = { mimeType: 'video/webm' };
+  }
+
+  recordedChunks = [];
+  try {
+    mediaRecorder = new MediaRecorder(stream, options);
+  } catch(e) {
+    alert("MediaRecorder error: " + e.message);
+    isRecording = false;
+    return;
+  }
+
+  mediaRecorder.ondataavailable = function(e){
+    if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+  };
+
+  mediaRecorder.onstop = function(){
+    isRecording = false;
+    document.getElementById('recStatus').style.display = 'none';
+    document.getElementById('btnDownloadVideo').textContent = '🎥 Download Video';
+    var blob = new Blob(recordedChunks, { type: 'video/webm' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'SiloGuard_AI_Cinematic_Presentation.webm';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  mediaRecorder.start();
+}
+
+// Initial draw
+renderFrame(0);
+updateControls();
+</script>
+</body>
+</html>
