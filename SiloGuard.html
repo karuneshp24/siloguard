@@ -1206,26 +1206,36 @@ function getFarmerEmail() {
   return (input && input.value) ? input.value : 'farmer@siloguard.com';
 }
 
+
+function getLiveDashboardUrl() {
+  if (typeof window !== 'undefined' && window.location && window.location.protocol && window.location.protocol.startsWith('http')) {
+    return window.location.origin + window.location.pathname.replace(/[^/]*$/, '') + 'index.html';
+  }
+  return 'https://karuneshp24.github.io/siloguard/index.html';
+}
+
 function getFarmerLocalizedText() {
+  var dashUrl = getLiveDashboardUrl();
+
   var phone = getFarmerPhone();
   if (currentLang === 'ta') {
     return "🚨 சைலோகார்ட் அவசர எச்சரிக்கை (சிலோ #4):\n" +
       "களஞ்சிய வெப்பநிலை 43.8°C ஆக உயர்ந்துள்ளது (Af=5.42x).\n" +
       "பாதுகாப்பு சேமிப்பு நேரம்: 22.8 மணிநேரம் மட்டுமே!\n" +
       "40% சேதமடைந்த தானியம் உயிர் எரிபொருள் ஆலைக்கு மாற்றப்படுகிறது.\n" +
-      "நேரலை நிலை பார்க்க: https://koala-surfer-crown.ngrok-free.dev/index.html";
+      "நேரலை நிலை பார்க்க: " + dashUrl;
   } else if (currentLang === 'hi') {
     return "🚨 साइलोगार्ड किसान आपातकालीन चेतावनी (साइलो #4):\n" +
       "साइलो का मुख्य तापमान 43.8°C तक बढ़ गया है (Af=5.42x)।\n" +
       "सुरक्षित भंडारण समय: केवल 22.8 घंटे शेष!\n" +
       "40% अनाज को बायोफ्यूल ऊर्जा संयंत्र में भेजा गया है।\n" +
-      "लाइव स्थिति देखें: https://koala-surfer-crown.ngrok-free.dev/index.html";
+      "लाइव स्थिति देखें: " + dashUrl;
   } else {
     return "🚨 SILOGUARD FARMER CRITICAL ALERT (Silo #4):\n" +
       "Deep Core Temp surged to 43.8°C (+14.2°C anomaly, Af=5.42x).\n" +
       "Safe storage remaining: 22.8 hours.\n" +
       "Nutrient Recovery Mode: 40% diverted to Biofuel, 60% preserved.\n" +
-      "View Digital Twin: https://koala-surfer-crown.ngrok-free.dev/index.html";
+      "View Digital Twin: " + dashUrl;
   }
 }
 
@@ -1267,7 +1277,7 @@ function dispatchFarmerPush() {
     "Title": "🚨 SiloGuard Farmer Emergency Alert",
     "Priority": "urgent",
     "Tags": "warning,biohazard,rotating_light",
-    "Click": "https://koala-surfer-crown.ngrok-free.dev/index.html"
+    "Click": dashUrl
   };
   if (email && email.includes('@')) {
     headers["X-Email"] = email;
